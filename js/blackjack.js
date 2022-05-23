@@ -13,6 +13,7 @@ let bet = 0;
 let user;
 const users = [];
 let auth = false;
+let i = 0;
 
 function menu(){
    let a = Number(prompt(`Bienvenido a Mesa de blackjack 21!
@@ -41,32 +42,34 @@ function menu(){
 
 function crearUser(){
     class User{
-        constructor(nombre, pass){
+        constructor(nombre, pass, fichas){
             this.nombre = nombre;
             this.pass = pass;
+            this.fichas = fichas;
         }
     }
-
-    user = new User(prompt("Ingrese su nombre"), prompt("Ingrese una contraseña"));
-    users.push(user);
+    
+    users[i] = new User(prompt("Ingrese su nombre"), prompt("Ingrese una contraseña"), 100);
+    i++;
     alert(`Registro exitoso! Para continuar, debe loguearse `);
+    console.log(users)
     menu();
 }
 
 function login(){
     let login = prompt("Ingrese usuario");
-    let pass = prompt("Ingrese contraseña");
-    switch(login === user.nombre && pass === user.pass){
-        case true:
-            alert("Login exitoso")
-            alert(`Bienvenido/a ${user.nombre}`)
+    let pass = prompt("Ingrese contraseña")
+    for(let j=0;j<=users.length-1;j++){
+        if(login === users[j].nombre && pass === users[j].pass){
+            alert(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
             auth = true;
-            menu()
+            menu();
             break;
-        case false:
-            alert("Datos erroneos. Intente nuevamente")
-            menu()
-            break;
+        }else{
+            alert("Usuario y contraseña no encontrados o incorrectos.")
+            auth = false;
+            menu();
+        }
     }
 }
 
