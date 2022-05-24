@@ -14,6 +14,8 @@ let user;
 const users = [];
 let auth = false;
 let i = 0;
+let userId = 0;
+
 
 class User{
     constructor(nombre, pass, fichas){
@@ -69,6 +71,7 @@ function login(){
             if(login === users[j].nombre && pass === users[j].pass){
                 alert(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
                 auth = true;
+                userId = j;
                 menu();
                 break;
             }else{
@@ -79,6 +82,24 @@ function login(){
         }
     }
 }
+
+
+function recarga(){
+    if(auth === false){
+        alert(`Para ver y recargar fichas es necesario estar logueado.`);
+        menu();        
+        
+    }else{
+        alert(`Tenes ${users[userId].fichas} fichas.`)
+        let carga = Number(prompt("Cuantas fichas queres cargar?"));
+        users[userId].fichas+=carga;
+        alert(`Ahora tenes ${users[userId].fichas}. Suerte!`);
+        menu();
+    }
+     
+}
+
+
 function repartir(){
     mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
     carta1 = mazo[Math.floor(Math.random() * mazo.length)];
@@ -258,8 +279,6 @@ function jugar(){
         alert("Debe iniciar sesion para poder jugar");
         menu();
     }
-    
-   
 }
 
 
