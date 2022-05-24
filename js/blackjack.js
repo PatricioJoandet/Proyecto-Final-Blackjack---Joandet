@@ -67,18 +67,19 @@ function login(){
         auth = false;
         menu();
     }else{
-        for(let j=0;j<=users.length-1;j++){
+        for(let j=0;j<users.length;j++){
             if(login === users[j].nombre && pass === users[j].pass){
                 alert(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
                 auth = true;
                 userId = j;
                 menu();
                 break;
-            }else{
-                alert("Usuario y contraseña no encontrados o incorrectos.")
-                auth = false;
-                menu();
             }
+        if(auth===false){
+            alert("Usuario y contraseña no encontrados o incorrectos.")
+            auth = false;
+            menu();
+        }
         }
     }
 }
