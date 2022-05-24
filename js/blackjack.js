@@ -15,6 +15,15 @@ const users = [];
 let auth = false;
 let i = 0;
 
+class User{
+    constructor(nombre, pass, fichas){
+        this.nombre = nombre;
+        this.pass = pass;
+        this.fichas = fichas;
+    }
+}
+
+
 function menu(){
    let a = Number(prompt(`Bienvenido a Mesa de blackjack 21!
     1. Crear usuario
@@ -41,14 +50,6 @@ function menu(){
 }
 
 function crearUser(){
-    class User{
-        constructor(nombre, pass, fichas){
-            this.nombre = nombre;
-            this.pass = pass;
-            this.fichas = fichas;
-        }
-    }
-    
     users[i] = new User(prompt("Ingrese su nombre"), prompt("Ingrese una contraseña"), 100);
     i++;
     alert(`Registro exitoso! Para continuar, debe loguearse `);
@@ -59,20 +60,25 @@ function crearUser(){
 function login(){
     let login = prompt("Ingrese usuario");
     let pass = prompt("Ingrese contraseña")
-    for(let j=0;j<=users.length-1;j++){
-        if(login === users[j].nombre && pass === users[j].pass){
-            alert(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
-            auth = true;
-            menu();
-            break;
-        }else{
-            alert("Usuario y contraseña no encontrados o incorrectos.")
-            auth = false;
-            menu();
+    if(users.length === 0){
+        alert("Usuario y contraseña no encontrados o incorrectos.")
+        auth = false;
+        menu();
+    }else{
+        for(let j=0;j<=users.length-1;j++){
+            if(login === users[j].nombre && pass === users[j].pass){
+                alert(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
+                auth = true;
+                menu();
+                break;
+            }else{
+                alert("Usuario y contraseña no encontrados o incorrectos.")
+                auth = false;
+                menu();
+            }
         }
     }
 }
-
 function repartir(){
     mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
     carta1 = mazo[Math.floor(Math.random() * mazo.length)];
@@ -98,6 +104,24 @@ function pedir(){
     mazo.splice(pos, 1);
     mano += carta1; 
 }
+
+function quedarse(){
+    alert(`Te quedaste con ${mano}. La Casa tiene ${manoPc}`)
+    if(manoPc<=16 && manoPc<mano){
+        while(manoPc<17){
+            alert("La casa pide una carta")
+            cartaPc = mazo[Math.floor(Math.random() * mazo.length)];
+            alert(`La casa saca ${cartaPc}`)
+            pos = mazo.indexOf(cartaPc);
+            mazo.splice(pos, 1);
+            manoPc+=cartaPc;
+            alert(`La casa tiene ${manoPc}`)
+        }
+    }
+
+}
+
+
 
 function jugar(){
     if(auth === true){
