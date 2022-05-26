@@ -289,11 +289,8 @@ function inicio(){
 }
 
 function fin(){
-    alert(`Resultados finales:
-    Victorias: ${won}
-    Derrotas: ${lost}
-    Empates: ${draw}`)
+
 }
 
-
+let p = document.getElementById("stats")
 menu();
