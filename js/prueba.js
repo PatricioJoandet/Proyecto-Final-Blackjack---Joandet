@@ -123,9 +123,9 @@ function jugar(){
         let x = 0;
         do{
             repartir()
-            alert(`Tus cartas son: ${carta1} y ${carta2}. Suman ${mano}. La Casa tiene un ${cartaPc} y una carta oculta.`)
+            div.innerHTML = `Tus cartas son: ${carta1} y ${carta2}. Suman ${mano}. La Casa tiene un ${cartaPc} y una carta oculta.`
             if(mano === 21){
-                alert("Blackjack! Ganaste!")
+                div.innerHTML = "Blackjack! Ganaste!"
                 won++;
                 x = prompt("Seguir jugando? SI - NO")
                 if(x === "SI"){
@@ -137,10 +137,15 @@ function jugar(){
                 }
             }
             while(mano!=21 && mano<21){
-                let op = prompt("PEDIR carta o QUEDARSE?");    
+                let op = document.createElement("button")
+                let op2 = document.createElement("button")
+                op.innerHTML = "PEDIR";
+                op2.innerHTML = "QUEDARSE";
+                div.appendChild(op);
+                div.appendChild(op2);    
                 if(op == "PEDIR"){
                     pedir();
-                    alert(`Tu carta es un ${carta1} y tu mano vale ${mano}`);
+                    div.innerHTML = `Tu carta es un ${carta1} y tu mano vale ${mano}`;
                     if(mano === 21){
                         alert("BLACKJACK! Ganaste!")
                         x = prompt("Seguir jugando? SI - NO")
