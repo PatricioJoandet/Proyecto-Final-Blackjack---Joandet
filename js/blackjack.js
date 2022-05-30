@@ -288,8 +288,10 @@ function inicio(){
     jugar();
 }
 
-function fin(){
-
+function fin(){ 
+    p.append(`Victorias: ${won}
+    Derrotas: ${lost}
+    Empates: ${draw}`)
 }
 
 let p = document.getElementById("stats")
