@@ -15,6 +15,7 @@ const users = [];
 let auth = false;
 let i = 0;
 let userId = 0;
+let div = document.getElementById("juego");
 
 
 class User{
@@ -25,38 +26,12 @@ class User{
     }
 }
 
-
-function menu(){
-   let a = Number(prompt(`Bienvenido a Mesa de blackjack 21!
-    1. Crear usuario
-    2. Ingresar
-    3. Jugar
-    4. Recarga`))
-    switch(a){
-        case 1:
-            crearUser()
-            break;
-        case 2:
-            login()
-            break;
-        case 3:
-            jugar()
-            break;
-        case 4:
-            recarga()
-            break;
-        default:
-            alert("Opcion no valida")
-            menu();
-    }
-}
-
 function crearUser(){
     users[i] = new User(prompt("Ingrese su nombre"), prompt("Ingrese una contraseña"), 100);
     i++;
     alert(`Registro exitoso! Para continuar, debe loguearse `);
     console.log(users)
-    menu();
+
 }
 
 function login(){
@@ -65,20 +40,20 @@ function login(){
     if(users.length === 0){
         alert("Usuario y contraseña no encontrados o incorrectos.")
         auth = false;
-        menu();
+
     }else{
         for(let j=0;j<users.length;j++){
             if(login === users[j].nombre && pass === users[j].pass){
                 alert(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
                 auth = true;
                 userId = j;
-                menu();
+
                 break;
             }
         if(auth===false){
             alert("Usuario y contraseña no encontrados o incorrectos.")
             auth = false;
-            menu();
+
         }
         }
     }
@@ -87,15 +62,12 @@ function login(){
 
 function recarga(){
     if(auth === false){
-        alert(`Para ver y recargar fichas es necesario estar logueado.`);
-        menu();        
-        
+        alert(`Para ver y recargar fichas es necesario estar logueado.`);       
     }else{
         alert(`Tenes ${users[userId].fichas} fichas.`)
         let carga = Number(prompt("Cuantas fichas queres cargar?"));
         users[userId].fichas+=carga;
         alert(`Ahora tenes ${users[userId].fichas}. Suerte!`);
-        menu();
     }
      
 }
@@ -151,9 +123,9 @@ function jugar(){
         let x = 0;
         do{
             repartir()
-            alert(`Tus cartas son: ${carta1} y ${carta2}. Suman ${mano}. La Casa tiene un ${cartaPc} y una carta oculta.`)
+            div.innerHTML = `Tus cartas son: ${carta1} y ${carta2}. Suman ${mano}. La Casa tiene un ${cartaPc} y una carta oculta.`
             if(mano === 21){
-                alert("Blackjack! Ganaste!")
+                div.innerHTML = "Blackjack! Ganaste!"
                 won++;
                 x = prompt("Seguir jugando? SI - NO")
                 if(x === "SI"){
@@ -165,15 +137,19 @@ function jugar(){
                 }
             }
             while(mano!=21 && mano<21){
-                let op = prompt("PEDIR carta o QUEDARSE?");    
+                let op = document.createElement("button")
+                let op2 = document.createElement("button")
+                op.innerHTML = "PEDIR";
+                op2.innerHTML = "QUEDARSE";
+                div.appendChild(op);
+                div.appendChild(op2);    
                 if(op == "PEDIR"){
                     pedir();
-                    alert(`Tu carta es un ${carta1} y tu mano vale ${mano}`);
+                    div.innerHTML = `Tu carta es un ${carta1} y tu mano vale ${mano}`;
                     if(mano === 21){
                         alert("BLACKJACK! Ganaste!")
                         x = prompt("Seguir jugando? SI - NO")
                         if(x === "SI"){
-    
                             again = true;
                             break;
                         }else if(x === "NO"){
@@ -278,7 +254,6 @@ function jugar(){
         }while(again==true);
     }else{
         alert("Debe iniciar sesion para poder jugar");
-        menu();
     }
 }
 
@@ -294,5 +269,37 @@ function fin(){
     Empates: ${draw}`)
 }
 
-let p = document.getElementById("stats")
-menu();
+let p = document.getElementById("stats");
+let nav = document.getElementById("nav");
+
+
+let btn1 = document.createElement("button");
+let btn2 = document.createElement("button");
+let btn3 = document.createElement("button");
+let btn4 = document.createElement("button");
+
+btn1.innerHTML = "Login";
+btn2.innerHTML = "Sign Up";
+btn3.innerHTML = "Jugar";
+btn4.innerHTML = "Recarga";
+
+nav.appendChild(btn1);
+nav.appendChild(btn2);
+nav.appendChild(btn3);
+nav.appendChild(btn4);
+
+btn1.addEventListener("click", () => {
+    login();
+});
+
+btn2.addEventListener("click", () => {
+    crearUser();
+});
+
+btn3.addEventListener("click", () => {
+    jugar();
+});
+
+btn4.addEventListener("click", () => {
+    recarga();
+});
