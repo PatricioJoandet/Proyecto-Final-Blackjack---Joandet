@@ -12,7 +12,7 @@ let mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,
 let bet = 0;
 let user;
 const users = [];
-let auth = false;
+let auth = true;
 let i = 0;
 let userId = 0;
 let div = document.getElementById("juego");
@@ -115,146 +115,67 @@ function quedarse(){
 
 }
 
+let op = document.createElement("button");
+let op2 = document.createElement("button");
+
+op.innerHTML = "Pedir";
+op2.innerHTML = "Quedarse";
+
+function opciones(){
+    op.addEventListener("click", () =>{
+                    pedir();
+                    div.innerHTML = `Tu carta es un ${carta1} y tu mano vale ${mano}`;
+                    if(mano === 21){
+                        div.innerHTML = "BLACKJACK! Ganaste!"
+                    }else if(mano>21){
+                        div.innerHTML = "Te pasaste!";
+                        lost += 1;
+                    } 
+                })
+                op2.addEventListener("click", () =>{
+                   div.innerHTML = `Te quedaste con ${mano}. La Casa tiene ${manoPc}`
+                    if(manoPc <= 16){
+                        while(manoPc<17){
+                            div.innerHTML ="La casa pide una carta"
+                            cartaPc = mazo[Math.floor(Math.random() * mazo.length)];
+                            pos = mazo.indexOf(cartaPc);
+                            mazo.splice(pos, 1);
+                            manoPc+=cartaPc;
+                            div.innerHTML = `La casa tiene ${manoPc}`
+                        }
+                    }   
+                    if(manoPc>21){
+                        div.innerHTML = `La casa se pasó con ${manoPc}. Ganaste!`
+                        won++;
+                    }else if(mano === 21){
+                       div.innerHTML = "BLACKJACK! Ganaste!";
+                    }else if(mano<manoPc){
+                        div.innerHTML = `La casa gana con ${manoPc}`;
+                        lost++;
+                    }else if(mano>manoPc){
+                       div.innerHTML = `Ganaste con ${mano}!`;         
+                        won+=1;
+                    }else if(mano===manoPc){
+                        div.innerHTML = "Empate";
+                        draw++;
+                    }
+    })
+}
 
 
 function jugar(){
-    if(auth === true){
-        again = true;
-        let x = 0;
-        do{
             repartir()
             div.innerHTML = `Tus cartas son: ${carta1} y ${carta2}. Suman ${mano}. La Casa tiene un ${cartaPc} y una carta oculta.`
             if(mano === 21){
                 div.innerHTML = "Blackjack! Ganaste!"
                 won++;
-                x = prompt("Seguir jugando? SI - NO")
-                if(x === "SI"){
-    
-                    again = true;
-                }else if(x === "NO"){
-                    fin()
-                    again = false;
-                }
-            }
+            }  
+            div.appendChild(op);
+            div.appendChild(op2);
             while(mano!=21 && mano<21){
-                let op = document.createElement("button")
-                let op2 = document.createElement("button")
-                op.innerHTML = "PEDIR";
-                op2.innerHTML = "QUEDARSE";
-                div.appendChild(op);
-                div.appendChild(op2);    
-                if(op == "PEDIR"){
-                    pedir();
-                    div.innerHTML = `Tu carta es un ${carta1} y tu mano vale ${mano}`;
-                    if(mano === 21){
-                        alert("BLACKJACK! Ganaste!")
-                        x = prompt("Seguir jugando? SI - NO")
-                        if(x === "SI"){
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }else if(mano>21){
-                        alert("Te pasaste!");
-                        lost += 1;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }   
-                    } 
-                }else if(op === "QUEDARSE"){
-                    alert(`Te quedaste con ${mano}. La Casa tiene ${manoPc}`)
-                    if(manoPc <= 16){
-                        while(manoPc<17){
-                            alert("La casa pide una carta")
-                            cartaPc = mazo[Math.floor(Math.random() * mazo.length)];
-                            pos = mazo.indexOf(cartaPc);
-                            mazo.splice(pos, 1);
-                            manoPc+=cartaPc;
-                            alert(`La casa tiene ${manoPc}`)
-                        }
-                    }   
-                        if(manoPc>21){
-                        alert(`La casa se pasó con ${manoPc}. Ganaste!`)
-                        won++;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }   
-                    }               
-                    if(mano === 21){
-                        alert("BLACKJACK! Ganaste!")
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }else if(mano<manoPc){
-                        alert(`La casa gana con ${manoPc}`)
-                        lost++;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }else if(mano>manoPc){
-                        alert(`Ganaste con ${mano}!`)                
-                        won+=1;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }else if(mano===manoPc){
-                        alert("Empate");
-                        draw++;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }
-                }
-            }
-        }while(again==true);
-    }else{
-        alert("Debe iniciar sesion para poder jugar");
-    }
+                opciones()
+            } 
+        
 }
 
 

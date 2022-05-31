@@ -116,7 +116,6 @@ function quedarse(){
 }
 
 
-
 function jugar(){
     if(auth === true){
         again = true;
@@ -259,9 +258,9 @@ function inicio(){
 }
 
 function fin(){ 
-    p.append(`Victorias: ${won}
+    p.innerHTML =`Victorias: ${won}
     Derrotas: ${lost}
-    Empates: ${draw}`)
+    Empates: ${draw}`
 }
 
 let p = document.getElementById("stats");
