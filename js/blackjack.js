@@ -12,10 +12,11 @@ let mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,
 let bet = 0;
 let user;
 const users = [];
-let auth = false;
+let auth = true;
 let i = 0;
 let userId = 0;
-let div = document.getElementById("juego");
+let div = document.getElementById("botones");
+let cartas = document.getElementById("cartas") 
 
 
 class User{
@@ -74,6 +75,8 @@ function recarga(){
 
 
 function repartir(){
+    mano = 0;
+    manoPc = 0;
     mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
     carta1 = mazo[Math.floor(Math.random() * mazo.length)];
     pos = mazo.indexOf(carta1);   /// Esto averigua el indice de la carta q salio
@@ -96,7 +99,17 @@ function pedir(){
     carta1 = mazo[Math.floor(Math.random() * mazo.length)];
     pos = mazo.indexOf(carta1);
     mazo.splice(pos, 1);
-    mano += carta1; 
+    mano += carta1;
+    cartas.innerHTML = `Tu carta es un ${carta1} y tu mano vale ${mano}. <br> La Casa tiene un ${cartaPc} y una carta oculta.`;
+    if(mano === 21){
+        cartas.innerHTML = "Blackjack! Ganaste!";
+        won++;
+        seguir()
+    }else if(mano>21){
+        cartas.innerHTML = "Te pasaste";
+        lost++;
+        seguir();
+    } 
 }
 
 function quedarse(){
@@ -115,31 +128,55 @@ function quedarse(){
 
 }
 
+function seguir(){
+    let seguir = document.createElement("p");
+    seguir.innerHTML = "Seguir jugando?";
+    let si = document.createElement("button");
+    let no = document.createElement("button");
+    si.innerHTML = "Si";
+    no.innerHTML = "No";
+    seguir.appendChild(si);
+    seguir.appendChild(no);
+    botones.appendChild(seguir)
+    btnQuedar.style.visibility = `hidden`;
+    btnPedir.style.visibility = `hidden`;                            
+    si.addEventListener("click", ()=>{
+        seguir.style.visibility = `hidden`
+        jugar()
+    })
+    no.addEventListener("click", ()=>{
+        fin()
+        again = false;
+    })
+}
+
 
 function jugar(){
+    div.appendChild(btnPedir);
+    div.appendChild(btnQuedar);
+    btnQuedar.style.visibility = `visible`;
+    btnPedir.style.visibility = `visible`;
     if(auth === true){
         again = true;
-        let x = 0;
-        do{
+        while(again === true){
             repartir()
-            alert(`Tus cartas son: ${carta1} y ${carta2}. Suman ${mano}. La Casa tiene un ${cartaPc} y una carta oculta.`)
+            cartas.innerHTML = `Tus cartas son: ${carta1} y ${carta2}. Suman ${mano}. <br> La Casa tiene un ${cartaPc} y una carta oculta.`;
             if(mano === 21){
-                alert("Blackjack! Ganaste!")
+                cartas.innerHTML = "Blackjack! Ganaste!";
                 won++;
-                x = prompt("Seguir jugando? SI - NO")
-                if(x === "SI"){
-    
-                    again = true;
-                }else if(x === "NO"){
-                    fin()
-                    again = false;
-                }
+                seguir()
             }
             while(mano!=21 && mano<21){
-                let op = prompt("PEDIR carta o QUEDARSE?");    
+                btnPedir.addEventListener("click", ()=>{
+                    pedir(); 
+        
+                })
+                btnQuedar.addEventListener("click", ()=>{
+                    quedarse()
+                })
                 if(op == "PEDIR"){
                     pedir();
-                    alert(`Tu carta es un ${carta1} y tu mano vale ${mano}`);
+
                     if(mano === 21){
                         alert("BLACKJACK! Ganaste!")
                         x = prompt("Seguir jugando? SI - NO")
@@ -166,7 +203,7 @@ function jugar(){
                         }   
                     } 
                 }else if(op === "QUEDARSE"){
-                    alert(`Te quedaste con ${mano}. La Casa tiene ${manoPc}`)
+                    cartas.innerHTML = `Te quedaste con ${mano}. La Casa tiene ${manoPc}`;
                     if(manoPc <= 16){
                         while(manoPc<17){
                             alert("La casa pide una carta")
@@ -245,7 +282,7 @@ function jugar(){
                     }
                 }
             }
-        }while(again==true);
+        }
     }else{
         alert("Debe iniciar sesion para poder jugar");
     }
@@ -281,6 +318,12 @@ nav.appendChild(btn1);
 nav.appendChild(btn2);
 nav.appendChild(btn3);
 nav.appendChild(btn4);
+
+let btnPedir = document.createElement("button");
+let btnQuedar = document.createElement("button");
+
+btnPedir.innerHTML = "Pedir";
+btnQuedar.innerHTML = "Quedarse";
 
 btn1.addEventListener("click", () => {
     login();
