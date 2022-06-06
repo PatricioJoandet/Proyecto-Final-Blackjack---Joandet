@@ -17,7 +17,11 @@ let i = 0;
 let userId = 0;
 let div = document.getElementById("botones");
 let cartas = document.getElementById("cartas") 
+<<<<<<< HEAD
 
+=======
+let x = 0;
+>>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
 
 class User{
     constructor(nombre, pass, fichas){
@@ -77,6 +81,13 @@ function recarga(){
 function repartir(){
     mano = 0;
     manoPc = 0;
+<<<<<<< HEAD
+=======
+    carta1 = 0;
+    carta2 = 0;
+    cartaPc = 0;
+    cartaPc2  = 0;
+>>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
     mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
     carta1 = mazo[Math.floor(Math.random() * mazo.length)];
     pos = mazo.indexOf(carta1);   /// Esto averigua el indice de la carta q salio
@@ -100,6 +111,7 @@ function pedir(){
     pos = mazo.indexOf(carta1);
     mazo.splice(pos, 1);
     mano += carta1;
+<<<<<<< HEAD
     cartas.innerHTML = `Tu carta es un ${carta1} y tu mano vale ${mano}. <br> La Casa tiene un ${cartaPc} y una carta oculta.`;
     if(mano === 21){
         cartas.innerHTML = "Blackjack! Ganaste!";
@@ -110,21 +122,23 @@ function pedir(){
         lost++;
         seguir();
     } 
+=======
+>>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
 }
 
 function quedarse(){
-    alert(`Te quedaste con ${mano}. La Casa tiene ${manoPc}`)
-    if(manoPc<=16 && manoPc<mano){
-        while(manoPc<17){
-            alert("La casa pide una carta")
-            cartaPc = mazo[Math.floor(Math.random() * mazo.length)];
-            alert(`La casa saca ${cartaPc}`)
-            pos = mazo.indexOf(cartaPc);
-            mazo.splice(pos, 1);
-            manoPc+=cartaPc;
-            alert(`La casa tiene ${manoPc}`)
-        }
+    let y = 0
+    cartas.innerHTML = `Te quedaste con ${mano}. La Casa tiene ${manoPc}`
+    for (y = 0;manoPc<17;y++){
+        cartaPc = mazo[Math.floor(Math.random() * mazo.length)];
+        pos = mazo.indexOf(cartaPc);
+        mazo.splice(pos, 1);
+        manoPc+=cartaPc;
     }
+    cartas.innerHTML = `Te quedaste con ${mano}.<br>La casa saca ${y} cartas y se queda con ${manoPc}`
+}
+
+function seguir(){
 
 }
 
@@ -152,6 +166,7 @@ function seguir(){
 
 
 function jugar(){
+<<<<<<< HEAD
     div.appendChild(btnPedir);
     div.appendChild(btnQuedar);
     btnQuedar.style.visibility = `visible`;
@@ -285,20 +300,33 @@ function jugar(){
         }
     }else{
         alert("Debe iniciar sesion para poder jugar");
+=======
+    console.log(mano);
+    btnPedir.disabled=false;
+    mano = 0;
+    manoPc = 0;
+    btnPedir.style.visibility = `visible`;
+    btnQuedar.style.visibility = `visible`;
+    repartir();
+    cartas.innerHTML = `Tus cartas son: ${carta1} y ${carta2}. Tu mano vale ${mano}.<br>
+                            La casa tiene un ${cartaPc} y una carta oculta.`;
+    if(mano === 21){
+        cartas.innerHTML = `Blackjack! Ganaste!`
+        seguir();
+    }else if(mano < 21){
+>>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
     }
 }
 
-
-function inicio(){
-    alert("Mesa de Blackjack. El objetivo es llegar a 21, o lo mas cercano, sin pasarse. si te pasas, perdes.")
-    jugar();
-}
 
 function fin(){ 
     p.innerHTML =`Victorias: ${won}
     Derrotas: ${lost}
     Empates: ${draw}`
 }
+
+
+
 
 let p = document.getElementById("stats");
 let nav = document.getElementById("nav");
@@ -322,9 +350,33 @@ nav.appendChild(btn4);
 let btnPedir = document.createElement("button");
 let btnQuedar = document.createElement("button");
 
+<<<<<<< HEAD
 btnPedir.innerHTML = "Pedir";
 btnQuedar.innerHTML = "Quedarse";
 
+=======
+div.appendChild(btnPedir);
+div.appendChild(btnQuedar);
+
+btnPedir.style.visibility = `hidden`
+btnQuedar.style.visibility = `hidden`
+
+btnPedir.innerHTML = "Pedir";
+btnQuedar.innerHTML = "Quedarse";
+
+
+btnPedir.addEventListener("click", () =>{
+    pedir();
+    console.log("hola")
+    cartas.innerHTML = `Sacaste un ${carta1}. Tu mano vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`;
+            if(mano>21){
+                cartas.innerHTML = `Te pasaste con ${mano}`
+                lost++
+                seguir()
+            }
+})
+
+>>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
 btn1.addEventListener("click", () => {
     login();
 });
