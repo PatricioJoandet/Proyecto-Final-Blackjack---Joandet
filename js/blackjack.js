@@ -16,12 +16,16 @@ let auth = true;
 let i = 0;
 let userId = 0;
 let div = document.getElementById("botones");
-let cartas = document.getElementById("cartas") 
-<<<<<<< HEAD
-
-=======
+let progreso = document.getElementById("progreso")
+let cartas = document.getElementById("cartas");
+let miMano = document.getElementById("mano");
 let x = 0;
->>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
+let seguir = document.createElement("p");
+seguir.innerHTML = "¿Seguir jugando?";
+let si = document.createElement("button");
+let no = document.createElement("button");
+
+
 
 class User{
     constructor(nombre, pass, fichas){
@@ -32,38 +36,91 @@ class User{
 }
 
 function crearUser(){
-    users[i] = new User(prompt("Ingrese su nombre"), prompt("Ingrese una contraseña"), 100);
-    i++;
-    alert(`Registro exitoso! Para continuar, debe loguearse `);
-    console.log(users)
+    const userCreate = document.createElement("input")
+    const userCreatePass = document.createElement("input")
+    const btnCrear = document.createElement("button")
+    btnCrear.innerHTML = "Registrarse"
+    userCreate.placeholder = "Nombre de usuario"
+    userCreatePass.placeholder = "Ingrese su contraseña"
+    userCreate.type = "text"
+    userCreatePass.type = "password"
+    const container = document.createElement("div")
+    container.id = "container"
+    let body = document.body
+    body.insertBefore(container,body.firstChild)
+    container.appendChild(userCreate)
+    container.appendChild(userCreatePass)
+    container.appendChild(btnCrear)
+    const ok = document.createElement("button")
+    ok.innerHTML = "Continuar"
+    btnCrear.addEventListener("click", ()=>{
+        if(userCreate === "" || userCreatePass === ""){
+            container.innerHTML = `Error de registro, intentelo nuevamente`
+            container.appendChild(ok)
 
+        }else{
+            users[i] = new User(userCreate.value,userCreatePass.value,100)
+            i++;
+            userCreate.remove()
+            userCreatePass.remove()
+            btnCrear.remove()
+            container.innerHTML = "Registro exitoso, inicie sesion para continuar."
+            container.appendChild(ok)
+            ok.addEventListener("click",()=>{
+                container.remove();
+            })
+        }
+    })
 }
 
 function login(){
-    let login = prompt("Ingrese usuario");
-    let pass = prompt("Ingrese contraseña")
-    if(users.length === 0){
-        alert("Usuario y contraseña no encontrados o incorrectos.")
-        auth = false;
-
-    }else{
-        for(let j=0;j<users.length;j++){
-            if(login === users[j].nombre && pass === users[j].pass){
-                alert(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
-                auth = true;
-                userId = j;
-
-                break;
-            }
-        if(auth===false){
-            alert("Usuario y contraseña no encontrados o incorrectos.")
+    const ok = document.createElement("button")
+    const userLogin = document.createElement("input")
+    const userPass = document.createElement("input")
+    const btnLogin = document.createElement("button")
+    btnLogin.innerHTML = "Log in"
+    ok.innerHTML = "Continuar"
+    userLogin.type = "text"
+    userLogin.placeholder = "Usuario"
+    userPass.type = "password"
+    userPass.placeholder= "Contraseña"
+    const container = document.createElement("div")
+    container.id = "container"
+    let body = document.body
+    body.insertBefore(container,body.firstChild)
+    container.appendChild(userLogin)
+    container.appendChild(userPass)
+    container.appendChild(btnLogin)
+    btnLogin.addEventListener("click", ()=>{
+        let userLoginInput = userLogin.value;
+        let userPassInput = userPass.value;
+        if(users.length === 0){
+            container.innerHTML = `Usuario y contraseña no encontrados o incorrectos`
+            container.appendChild(ok)
             auth = false;
-
+            ok.addEventListener("click", ()=>{
+                container.remove();
+            })
+        }else{
+            for(let j=0;j<users.length;j++){
+                if(userLoginInput === users[j].nombre && userPassInput === users[j].pass){
+                    alert(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
+                    auth = true;
+                    userId = j;
+                    break;
+                }
+            if(auth===false){
+                alert("Usuario y contraseña no encontrados o incorrectos.")
+                auth = false;
+            }
         }
+        console.log(userLoginInput)
+        userLogin.remove()
+        userPass.remove()
+        btnLogin.remove()
         }
-    }
+    })
 }
-
 
 function recarga(){
     if(auth === false){
@@ -81,13 +138,10 @@ function recarga(){
 function repartir(){
     mano = 0;
     manoPc = 0;
-<<<<<<< HEAD
-=======
     carta1 = 0;
     carta2 = 0;
     cartaPc = 0;
     cartaPc2  = 0;
->>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
     mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
     carta1 = mazo[Math.floor(Math.random() * mazo.length)];
     pos = mazo.indexOf(carta1);   /// Esto averigua el indice de la carta q salio
@@ -103,6 +157,7 @@ function repartir(){
     pos = mazo.indexOf(cartaPc2);
     mazo.splice(pos, 1);
     manoPc = cartaPc + cartaPc2;
+    progreso.innerHTML = `Empieza el juego y se reparten las cartas.`
     
 }
  
@@ -111,222 +166,65 @@ function pedir(){
     pos = mazo.indexOf(carta1);
     mazo.splice(pos, 1);
     mano += carta1;
-<<<<<<< HEAD
-    cartas.innerHTML = `Tu carta es un ${carta1} y tu mano vale ${mano}. <br> La Casa tiene un ${cartaPc} y una carta oculta.`;
-    if(mano === 21){
-        cartas.innerHTML = "Blackjack! Ganaste!";
-        won++;
-        seguir()
-    }else if(mano>21){
-        cartas.innerHTML = "Te pasaste";
-        lost++;
-        seguir();
-    } 
-=======
->>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
 }
 
 function quedarse(){
     let y = 0
-    cartas.innerHTML = `Te quedaste con ${mano}. La Casa tiene ${manoPc}`
+    cartas.innerHTML = ``
     for (y = 0;manoPc<17;y++){
         cartaPc = mazo[Math.floor(Math.random() * mazo.length)];
         pos = mazo.indexOf(cartaPc);
         mazo.splice(pos, 1);
         manoPc+=cartaPc;
+        if(manoPc>21){
+            progreso.innerHTML = `La casa se pasa con ${manoPc}. Ganaste!`
+            won++;
+        }
     }
-    cartas.innerHTML = `Te quedaste con ${mano}.<br>La casa saca ${y} cartas y se queda con ${manoPc}`
+    progreso.innerHTML = `Te quedaste con ${mano}.<br>La casa saca ${y} cartas y se queda con ${manoPc}`
+    if(mano<manoPc){
+        miMano.innerHTML = `La casa gana con ${manoPc}`
+        lost++
+        cont();
+    }else if(mano === manoPc){
+        miMano.innerHTML = `Empate`
+        draw++;
+        cont()
+    }else if(mano>manoPc && mano<21){
+        miMano.innerHTML= `Ganaste!`
+        won++
+        cont()
+    }
 }
 
-function seguir(){
-
-}
-
-function seguir(){
-    let seguir = document.createElement("p");
-    seguir.innerHTML = "Seguir jugando?";
-    let si = document.createElement("button");
-    let no = document.createElement("button");
-    si.innerHTML = "Si";
-    no.innerHTML = "No";
-    seguir.appendChild(si);
-    seguir.appendChild(no);
-    botones.appendChild(seguir)
-    btnQuedar.style.visibility = `hidden`;
-    btnPedir.style.visibility = `hidden`;                            
-    si.addEventListener("click", ()=>{
-        seguir.style.visibility = `hidden`
-        jugar()
-    })
-    no.addEventListener("click", ()=>{
-        fin()
-        again = false;
-    })
-}
 
 
 function jugar(){
-<<<<<<< HEAD
-    div.appendChild(btnPedir);
-    div.appendChild(btnQuedar);
-    btnQuedar.style.visibility = `visible`;
-    btnPedir.style.visibility = `visible`;
-    if(auth === true){
-        again = true;
-        while(again === true){
-            repartir()
-            cartas.innerHTML = `Tus cartas son: ${carta1} y ${carta2}. Suman ${mano}. <br> La Casa tiene un ${cartaPc} y una carta oculta.`;
-            if(mano === 21){
-                cartas.innerHTML = "Blackjack! Ganaste!";
-                won++;
-                seguir()
-            }
-            while(mano!=21 && mano<21){
-                btnPedir.addEventListener("click", ()=>{
-                    pedir(); 
-        
-                })
-                btnQuedar.addEventListener("click", ()=>{
-                    quedarse()
-                })
-                if(op == "PEDIR"){
-                    pedir();
-
-                    if(mano === 21){
-                        alert("BLACKJACK! Ganaste!")
-                        x = prompt("Seguir jugando? SI - NO")
-                        if(x === "SI"){
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }else if(mano>21){
-                        alert("Te pasaste!");
-                        lost += 1;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }   
-                    } 
-                }else if(op === "QUEDARSE"){
-                    cartas.innerHTML = `Te quedaste con ${mano}. La Casa tiene ${manoPc}`;
-                    if(manoPc <= 16){
-                        while(manoPc<17){
-                            alert("La casa pide una carta")
-                            cartaPc = mazo[Math.floor(Math.random() * mazo.length)];
-                            pos = mazo.indexOf(cartaPc);
-                            mazo.splice(pos, 1);
-                            manoPc+=cartaPc;
-                            alert(`La casa tiene ${manoPc}`)
-                        }
-                    }   
-                        if(manoPc>21){
-                        alert(`La casa se pasó con ${manoPc}. Ganaste!`)
-                        won++;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }   
-                    }               
-                    if(mano === 21){
-                        alert("BLACKJACK! Ganaste!")
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }else if(mano<manoPc){
-                        alert(`La casa gana con ${manoPc}`)
-                        lost++;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }else if(mano>manoPc){
-                        alert(`Ganaste con ${mano}!`)                
-                        won+=1;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }else if(mano===manoPc){
-                        alert("Empate");
-                        draw++;
-                        x = prompt("Seguir jugando? SI - No")
-                        if(x === "SI"){
-    
-                            again = true;
-                            break;
-                        }else if(x === "NO"){
-                            fin()
-                            again = false;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }else{
-        alert("Debe iniciar sesion para poder jugar");
-=======
-    console.log(mano);
     btnPedir.disabled=false;
+    btnQuedar.disabled=false;
     mano = 0;
     manoPc = 0;
     btnPedir.style.visibility = `visible`;
     btnQuedar.style.visibility = `visible`;
     repartir();
-    cartas.innerHTML = `Tus cartas son: ${carta1} y ${carta2}. Tu mano vale ${mano}.<br>
-                            La casa tiene un ${cartaPc} y una carta oculta.`;
+    console.log(mano);
+    cartas.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}.<br> `;
+    miMano.innerHTML = `<b> Valor de tu mano: </b> ${mano}.<br> La casa tiene un ${cartaPc} y una carta oculta.`
     if(mano === 21){
         cartas.innerHTML = `Blackjack! Ganaste!`
-        seguir();
-    }else if(mano < 21){
->>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
+        cont();
     }
 }
 
+function cont(){
+    seguir.style.visibility= "visible"
+}
 
 function fin(){ 
     p.innerHTML =`Victorias: ${won}
     Derrotas: ${lost}
     Empates: ${draw}`
 }
-
-
-
 
 let p = document.getElementById("stats");
 let nav = document.getElementById("nav");
@@ -350,11 +248,6 @@ nav.appendChild(btn4);
 let btnPedir = document.createElement("button");
 let btnQuedar = document.createElement("button");
 
-<<<<<<< HEAD
-btnPedir.innerHTML = "Pedir";
-btnQuedar.innerHTML = "Quedarse";
-
-=======
 div.appendChild(btnPedir);
 div.appendChild(btnQuedar);
 
@@ -367,16 +260,33 @@ btnQuedar.innerHTML = "Quedarse";
 
 btnPedir.addEventListener("click", () =>{
     pedir();
-    console.log("hola")
-    cartas.innerHTML = `Sacaste un ${carta1}. Tu mano vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`;
-            if(mano>21){
-                cartas.innerHTML = `Te pasaste con ${mano}`
-                lost++
-                seguir()
-            }
+    progreso.innerHTML = `Pediste una carta.`
+    cartas.innerHTML = `Sacaste un ${carta1}. `;
+    miMano.innerHTML = `Tu mano vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`
+    if (mano === 21){
+        progreso.innerHTML = `Blackjack! Ganaste!`
+        btnPedir.disabled = true;
+        btnQuedar.disabled = true;
+        won++
+        cont();
+    }else if(mano>21){
+        progreso.innerHTML = `Te pasaste! Perdiste`
+        btnPedir.disabled = true;
+        btnQuedar.disabled = true;
+        lost++;
+        cont();
+    }
+
 })
 
->>>>>>> e3c736fb70d8df8e7963af82f130191495eb16cf
+
+btnQuedar.addEventListener("click", () =>{
+    btnPedir.disabled = true;
+    btnQuedar.disabled = true;
+    progreso.innerHTML = `Te quedaste`
+    quedarse()
+})
+
 btn1.addEventListener("click", () => {
     login();
 });
@@ -392,3 +302,23 @@ btn3.addEventListener("click", () => {
 btn4.addEventListener("click", () => {
     recarga();
 });
+
+
+si.innerHTML = "Si";
+no.innerHTML = "No";
+seguir.appendChild(si);
+seguir.appendChild(no);
+botones.appendChild(seguir)
+seguir.style.visibility = `hidden`         
+
+si.addEventListener("click", () =>{
+    seguir.style.visibility = "hidden"
+    jugar()
+})
+
+no.addEventListener("click", () =>{
+    seguir.style.visibility = "hidden";
+    fin();
+})
+
+
