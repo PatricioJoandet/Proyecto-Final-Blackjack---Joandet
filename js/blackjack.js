@@ -12,7 +12,7 @@ let mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,
 let bet = 0;
 let user;
 const users = [];
-let auth = true;
+let auth = false;
 let i = 0;
 let userId = 0;
 let div = document.getElementById("botones");
@@ -24,6 +24,10 @@ let seguir = document.createElement("p");
 seguir.innerHTML = "¿Seguir jugando?";
 let si = document.createElement("button");
 let no = document.createElement("button");
+const container = document.createElement("div")
+container.id = "container"
+let body = document.body
+
 
 
 
@@ -35,18 +39,18 @@ class User{
     }
 }
 
-function crearUser(){
+function crearUser(){ // ACA FIJATE QUE CADA VEZ Q TOCAS SE AGREGAN
     const userCreate = document.createElement("input")
     const userCreatePass = document.createElement("input")
     const btnCrear = document.createElement("button")
+    
     btnCrear.innerHTML = "Registrarse"
     userCreate.placeholder = "Nombre de usuario"
     userCreatePass.placeholder = "Ingrese su contraseña"
     userCreate.type = "text"
     userCreatePass.type = "password"
-    const container = document.createElement("div")
-    container.id = "container"
-    let body = document.body
+
+    
     body.insertBefore(container,body.firstChild)
     container.appendChild(userCreate)
     container.appendChild(userCreatePass)
@@ -54,10 +58,13 @@ function crearUser(){
     const ok = document.createElement("button")
     ok.innerHTML = "Continuar"
     btnCrear.addEventListener("click", ()=>{
-        if(userCreate === "" || userCreatePass === ""){
+
+        if(userCreate.value === "" || userCreatePass.value === ""){
             container.innerHTML = `Error de registro, intentelo nuevamente`
             container.appendChild(ok)
-
+            ok.addEventListener("click", ()=>{
+                container.remove();
+            })
         }else{
             users[i] = new User(userCreate.value,userCreatePass.value,100)
             i++;
@@ -73,7 +80,7 @@ function crearUser(){
     })
 }
 
-function login(){
+function login(){ // ACA FIJATE QUE CADA VEZ Q TOCAS SE AGREGAN
     const ok = document.createElement("button")
     const userLogin = document.createElement("input")
     const userPass = document.createElement("input")
@@ -83,10 +90,7 @@ function login(){
     userLogin.type = "text"
     userLogin.placeholder = "Usuario"
     userPass.type = "password"
-    userPass.placeholder= "Contraseña"
-    const container = document.createElement("div")
-    container.id = "container"
-    let body = document.body
+    userPass.placeholder= "Contraseña"    
     body.insertBefore(container,body.firstChild)
     container.appendChild(userLogin)
     container.appendChild(userPass)
@@ -94,7 +98,7 @@ function login(){
     btnLogin.addEventListener("click", ()=>{
         let userLoginInput = userLogin.value;
         let userPassInput = userPass.value;
-        if(users.length === 0){
+        if(users.length === 0 || userLogin.value === "" || userPass.value === ""){
             container.innerHTML = `Usuario y contraseña no encontrados o incorrectos`
             container.appendChild(ok)
             auth = false;
@@ -200,20 +204,27 @@ function quedarse(){
 
 
 function jugar(){
-    btnPedir.disabled=false;
-    btnQuedar.disabled=false;
-    mano = 0;
-    manoPc = 0;
-    btnPedir.style.visibility = `visible`;
-    btnQuedar.style.visibility = `visible`;
-    repartir();
-    console.log(mano);
-    cartas.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}.<br> `;
-    miMano.innerHTML = `<b> Valor de tu mano: </b> ${mano}.<br> La casa tiene un ${cartaPc} y una carta oculta.`
-    if(mano === 21){
-        cartas.innerHTML = `Blackjack! Ganaste!`
-        cont();
+    if(auth === false){
+        container.innerHTML = "Es necesario iniciar sesion para poder jugar"
+        body.insertBefore(container,body.firstChild)
+
+    }else{
+        btnPedir.disabled=false;
+        btnQuedar.disabled=false;
+        mano = 0;
+        manoPc = 0;
+        btnPedir.style.visibility = `visible`;
+        btnQuedar.style.visibility = `visible`;
+        repartir();
+        console.log(mano);
+        cartas.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}.<br> `;
+        miMano.innerHTML = `<b> Valor de tu mano: </b> ${mano}.<br> La casa tiene un ${cartaPc} y una carta oculta.`
+        if(mano === 21){
+            cartas.innerHTML = `Blackjack! Ganaste!`
+            cont();
+        }
     }
+
 }
 
 function cont(){
@@ -288,10 +299,12 @@ btnQuedar.addEventListener("click", () =>{
 })
 
 btn1.addEventListener("click", () => {
+    container.innerHTML= ""
     login();
 });
 
 btn2.addEventListener("click", () => {
+    container.innerHTML= ""
     crearUser();
 });
 
@@ -321,4 +334,38 @@ no.addEventListener("click", () =>{
     fin();
 })
 
+
+
+
+const btnMode = document.createElement("button")
+btnMode.innerHTML = "Tema claro/Tema oscuro"
+nav.appendChild(btnMode);
+
+document.body.classList.add(localStorage.getItem("tema"))
+
+function mode(){
+    let tema = localStorage.getItem("tema")
+    console.log("a")
+}
+
+btnMode.addEventListener("click", () =>{
+    if(document.body.className === "null"){
+        document.body.classList.add("dkMode")
+        localStorage.setItem("tema","dkMode")
+        mode()
+    }
+    
+    if(document.body.className === "lgMode"){
+        document.body.classList.remove("lgMode")
+        document.body.classList.add("dkMode")
+        localStorage.setItem("tema","dkMode")
+        mode()
+    }else if(document.body.className === "dkMode"){
+        localStorage.setItem("tema","lgMode")
+        document.body.classList.remove("dkMode")
+        document.body.classList.add("lgMode")
+        
+        mode()
+    }
+})
 
