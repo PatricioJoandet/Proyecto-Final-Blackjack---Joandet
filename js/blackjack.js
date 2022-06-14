@@ -124,7 +124,6 @@ function login(){
                 auth = false;
             }
         }
-        console.log(userLoginInput)
         userLogin.remove()
         userPass.remove()
         btnLogin.remove()
@@ -136,12 +135,21 @@ function recarga(){
     if(auth === false){
         noti(`Para ver y recargar fichas es necesario estar logueado.`);       
     }else{
-        alert(`Tenes ${users[userId].fichas} fichas.`)
-        let carga = Number(prompt("Cuantas fichas queres cargar?"));
-        users[userId].fichas+=carga;
-        alert(`Ahora tenes ${users[userId].fichas}. Suerte!`);
+        noti(`Tenes ${users[userId].fichas} fichas.`)
+        const cargar = document.createElement("button")
+        const cargaInput = document.createElement("input")
+        cargar.innerHTML = "Cargar"
+        cargaInput.placeholder= "Cantidad de fichas a cargar"    
+        body.insertBefore(container,body.firstChild)
+        container.appendChild(cargaInput)
+        container.appendChild(cargar)
+        cargar.addEventListener("click",()=>{
+            carga = Number(cargaInput.value)
+            users[userId].fichas+=carga;
+            noti(`Ahora tenes ${users[userId].fichas}. Suerte!`);
+            container.remove()
+        })
     }
-     
 }
 
 
@@ -319,6 +327,7 @@ btn3.addEventListener("click", () => {
 });
 
 btn4.addEventListener("click", () => {
+    container.innerHTML= ""
     recarga();
 });
 
