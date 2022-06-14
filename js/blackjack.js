@@ -28,8 +28,12 @@ const container = document.createElement("div")
 container.id = "container"
 let body = document.body
 
-
-
+function noti(msg){
+    Toastify({
+        text: msg,
+        duration: 1500
+        }).showToast();
+}
 
 class User{
     constructor(nombre, pass, fichas){
@@ -39,7 +43,7 @@ class User{
     }
 }
 
-function crearUser(){ // ACA FIJATE QUE CADA VEZ Q TOCAS SE AGREGAN
+function crearUser(){ 
     const userCreate = document.createElement("input")
     const userCreatePass = document.createElement("input")
     const btnCrear = document.createElement("button")
@@ -80,7 +84,7 @@ function crearUser(){ // ACA FIJATE QUE CADA VEZ Q TOCAS SE AGREGAN
     })
 }
 
-function login(){ // ACA FIJATE QUE CADA VEZ Q TOCAS SE AGREGAN
+function login(){ 
     const ok = document.createElement("button")
     const userLogin = document.createElement("input")
     const userPass = document.createElement("input")
@@ -99,7 +103,8 @@ function login(){ // ACA FIJATE QUE CADA VEZ Q TOCAS SE AGREGAN
         let userLoginInput = userLogin.value;
         let userPassInput = userPass.value;
         if(users.length === 0 || userLogin.value === "" || userPass.value === ""){
-            container.innerHTML = `Usuario y contraseña no encontrados o incorrectos`
+            container.innerHTML = ""
+            noti(`Usuario y contraseña no encontrados o incorrectos`)
             container.appendChild(ok)
             auth = false;
             ok.addEventListener("click", ()=>{
@@ -108,13 +113,14 @@ function login(){ // ACA FIJATE QUE CADA VEZ Q TOCAS SE AGREGAN
         }else{
             for(let j=0;j<users.length;j++){
                 if(userLoginInput === users[j].nombre && userPassInput === users[j].pass){
-                    alert(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
+                    noti(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
                     auth = true;
                     userId = j;
                     break;
                 }
             if(auth===false){
-                alert("Usuario y contraseña no encontrados o incorrectos.")
+                container.innerHTML = ""
+                noti(`Usuario y contraseña no encontrados o incorrectos`)
                 auth = false;
             }
         }
@@ -128,7 +134,7 @@ function login(){ // ACA FIJATE QUE CADA VEZ Q TOCAS SE AGREGAN
 
 function recarga(){
     if(auth === false){
-        alert(`Para ver y recargar fichas es necesario estar logueado.`);       
+        noti(`Para ver y recargar fichas es necesario estar logueado.`);       
     }else{
         alert(`Tenes ${users[userId].fichas} fichas.`)
         let carga = Number(prompt("Cuantas fichas queres cargar?"));
