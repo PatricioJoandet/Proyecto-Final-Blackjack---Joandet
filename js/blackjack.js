@@ -11,7 +11,7 @@ let pos = 0;
 let bet = 0;
 let user;
 const users = [];
-let auth = true;
+let auth = false;
 let i = 0;
 let userId = 0;
 let div = document.getElementById("botones");
