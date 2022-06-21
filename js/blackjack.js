@@ -28,7 +28,6 @@ container.id = "container"
 let body = document.body
 let mazoApi = 0;
 
-
 function noti(msg){
     Toastify({
         text: msg,
@@ -272,6 +271,7 @@ async function jugar(){
         btnQuedar.style.visibility = `visible`;
         cartas.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}.<br> `;
         miMano.innerHTML = `Tu mano es ${mano}.La casa tiene un ${cartaPc} y una carta oculta.`
+        
         if(mano === 21){
             cartas.innerHTML = `Blackjack! Ganaste!`
             cont();
