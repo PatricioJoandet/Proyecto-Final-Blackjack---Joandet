@@ -8,11 +8,10 @@ let won = 0;
 let lost = 0;
 let draw = 0;
 let pos = 0;
-let mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
 let bet = 0;
 let user;
 const users = [];
-let auth = false;
+let auth = true;
 let i = 0;
 let userId = 0;
 let div = document.getElementById("botones");
@@ -27,6 +26,8 @@ let no = document.createElement("button");
 const container = document.createElement("div")
 container.id = "container"
 let body = document.body
+let mazoApi = 0;
+
 
 function noti(msg){
     Toastify({
@@ -153,46 +154,85 @@ function recarga(){
 }
 
 
-function repartir(){
+async function repartir(){
     mano = 0;
     manoPc = 0;
     carta1 = 0;
     carta2 = 0;
     cartaPc = 0;
     cartaPc2  = 0;
-    mazo = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
-    carta1 = mazo[Math.floor(Math.random() * mazo.length)];
-    pos = mazo.indexOf(carta1);   /// Esto averigua el indice de la carta q salio
-    mazo.splice(pos, 1);          /// Aca se borra esa carta del mazo para evitar que salgan repetidas
-    carta2 = mazo[Math.floor(Math.random() * mazo.length)];
-    pos = mazo.indexOf(carta2);
-    mazo.splice(pos, 1);
-    mano = carta1 + carta2;
-    cartaPc = mazo[Math.floor(Math.random() * mazo.length)];
-    pos = mazo.indexOf(cartaPc);
-    mazo.splice(pos, 1);
-    cartaPc2 = mazo[Math.floor(Math.random() * mazo.length)];
-    pos = mazo.indexOf(cartaPc2);
-    mazo.splice(pos, 1);
-    manoPc = cartaPc + cartaPc2;
+    await fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
+    .then(resp => resp.json())
+    .then(data =>{
+    mazoApi=data;
+    })
+    let call = await fetch(`https://deckofcardsapi.com/api/deck/${mazoApi.deck_id}/draw/?count=4`)
+    let resp = await call.json()
+    console.log(resp)
+    carta1 = resp.cards[0].value
+    if(carta1!= "JACK" && carta1 != "QUEEN" && carta1 != "KING" && carta1 != "ACE"){
+        carta1= Number(carta1)
+    }
+    if(carta1 === "JACK" || carta1 === "QUEEN" || carta1 === "KING" || carta1 === "ACE"){
+        carta1 = 10;
+    }
+    carta2 = resp.cards[1].value
+    if(carta2 != "JACK" && carta2 != "QUEEN" && carta2 != "KING" && carta2 != "ACE"){
+        carta2= Number(carta2)
+    }
+    if(carta2 === "JACK" || carta2 === "QUEEN" || carta2 === "KING" || carta2 === "ACE"){
+        carta2 = 10;
+    }
+    mano = carta1 + carta2
+
+    cartaPc = resp.cards[2].value
+    if(cartaPc!= "JACK" && cartaPc != "QUEEN" && cartaPc != "KING" && cartaPc != "ACE"){
+        cartaPc= Number(cartaPc)
+    }
+    if(cartaPc === "JACK" || cartaPc === "QUEEN" || cartaPc === "KING" || cartaPc === "ACE"){
+        carta1 = 10;
+    }
+    cartaPc2 = resp.cards[3].value
+    if(cartaPc2!= "JACK" && cartaPc2 != "QUEEN" && cartaPc2 != "KING" && cartaPc2 != "ACE"){
+        cartaPc2= Number(cartaPc2)
+    }
+    if(cartaPc2 === "JACK" || cartaPc2 === "QUEEN" || cartaPc2 === "KING" || cartaPc2 === "ACE"){
+        cartaPc2 = 10;
+    }
+    manoPc = cartaPc + cartaPc2
     progreso.innerHTML = `Empieza el juego y se reparten las cartas.`
     
 }
  
-function pedir(){
-    carta1 = mazo[Math.floor(Math.random() * mazo.length)];
-    pos = mazo.indexOf(carta1);
-    mazo.splice(pos, 1);
-    mano += carta1;
+async function pedir(){
+    let call = await fetch(`https://deckofcardsapi.com/api/deck/${mazoApi.deck_id}/draw/?count=1`)
+    let resp = await call.json()
+    carta1 = resp.cards[0].value
+    if(carta1!= "JACK" && carta1 != "QUEEN" && carta1 != "KING" && carta1 != "ACE"){
+        carta1= Number(carta1)
+    }
+    if(carta1 === "JACK" || carta1 === "QUEEN" || carta1 === "KING" || carta1 === "ACE"){
+        carta1 = 10;
+    }
+    mano+=carta1
+    progreso.innerHTML = `Pediste una carta.`
+    cartas.innerHTML = await `Sacaste un ${carta1}. `;
+    miMano.innerHTML = await `Tu mano vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`
 }
 
-function quedarse(){
+async function quedarse(){
     let y = 0
     cartas.innerHTML = ``
     for (y = 0;manoPc<17;y++){
-        cartaPc = mazo[Math.floor(Math.random() * mazo.length)];
-        pos = mazo.indexOf(cartaPc);
-        mazo.splice(pos, 1);
+        let call = await fetch(`https://deckofcardsapi.com/api/deck/${mazoApi.deck_id}/draw/?count=1`)
+        let resp = await call.json()
+        cartaPc = resp.cards[0].value
+        if(cartaPc!= "JACK" && cartaPc != "QUEEN" && cartaPc != "KING" && cartaPc != "ACE"){
+            cartaPc= Number(cartaPc)
+        }
+        if(cartaPc === "JACK" || cartaPc === "QUEEN" || cartaPc === "KING" || cartaPc === "ACE"){
+            cartaPc = 10;
+        }
         manoPc+=cartaPc;
         if(manoPc>21){
             progreso.innerHTML = `La casa se pasa con ${manoPc}. Ganaste!`
@@ -217,7 +257,7 @@ function quedarse(){
 
 
 
-function jugar(){
+async function jugar(){
     if(auth === false){
         container.innerHTML = "Es necesario iniciar sesion para poder jugar"
         body.insertBefore(container,body.firstChild)
@@ -227,12 +267,11 @@ function jugar(){
         btnQuedar.disabled=false;
         mano = 0;
         manoPc = 0;
+        await repartir();
         btnPedir.style.visibility = `visible`;
         btnQuedar.style.visibility = `visible`;
-        repartir();
-        console.log(mano);
         cartas.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}.<br> `;
-        miMano.innerHTML = `<b> Valor de tu mano: </b> ${mano}.<br> La casa tiene un ${cartaPc} y una carta oculta.`
+        miMano.innerHTML = `Tu mano es ${mano}.La casa tiene un ${cartaPc} y una carta oculta.`
         if(mano === 21){
             cartas.innerHTML = `Blackjack! Ganaste!`
             cont();
@@ -285,9 +324,6 @@ btnQuedar.innerHTML = "Quedarse";
 
 btnPedir.addEventListener("click", () =>{
     pedir();
-    progreso.innerHTML = `Pediste una carta.`
-    cartas.innerHTML = `Sacaste un ${carta1}. `;
-    miMano.innerHTML = `Tu mano vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`
     if (mano === 21){
         progreso.innerHTML = `Blackjack! Ganaste!`
         btnPedir.disabled = true;
@@ -348,8 +384,6 @@ no.addEventListener("click", () =>{
     seguir.style.visibility = "hidden";
     fin();
 })
-
-
 
 
 const btnMode = document.createElement("button")
