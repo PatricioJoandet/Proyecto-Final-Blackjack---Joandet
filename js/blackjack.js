@@ -189,7 +189,7 @@ async function repartir(){
         cartaPc= Number(cartaPc)
     }
     if(cartaPc === "JACK" || cartaPc === "QUEEN" || cartaPc === "KING" || cartaPc === "ACE"){
-        carta1 = 10;
+        cartaPc = 10;
     }
     cartaPc2 = resp.cards[3].value
     if(cartaPc2!= "JACK" && cartaPc2 != "QUEEN" && cartaPc2 != "KING" && cartaPc2 != "ACE"){
