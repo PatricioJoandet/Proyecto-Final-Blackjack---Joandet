@@ -11,7 +11,7 @@ let pos = 0;
 let bet = 0;
 let user;
 const users = [];
-let auth = false;
+let auth = true;
 let i = 0;
 let userId = 0;
 let div = document.getElementById("botones");
@@ -47,14 +47,11 @@ function crearUser(){
     const userCreate = document.createElement("input")
     const userCreatePass = document.createElement("input")
     const btnCrear = document.createElement("button")
-    
     btnCrear.innerHTML = "Registrarse"
     userCreate.placeholder = "Nombre de usuario"
     userCreatePass.placeholder = "Ingrese su contraseña"
     userCreate.type = "text"
     userCreatePass.type = "password"
-
-    
     body.insertBefore(container,body.firstChild)
     container.appendChild(userCreate)
     container.appendChild(userCreatePass)
@@ -215,8 +212,15 @@ async function pedir(){
     }
     mano+=carta1
     progreso.innerHTML = `Pediste una carta.`
-    cartas.innerHTML = await `Sacaste un ${carta1}. `;
-    miMano.innerHTML = await `Tu mano vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`
+    cartas.innerHTML = `Sacaste un ${carta1}. `;
+    miMano.innerHTML = `Tu mano vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`
+    if(mano>21){
+        progreso.innerHTML = `Te pasaste!`
+        lost++
+        btnPedir.disabled = true;
+        btnQuedar.disabled = true;
+        cont()
+    }
 }
 
 async function quedarse(){
@@ -233,13 +237,13 @@ async function quedarse(){
             cartaPc = 10;
         }
         manoPc+=cartaPc;
-        if(manoPc>21){
-            progreso.innerHTML = `La casa se pasa con ${manoPc}. Ganaste!`
-            won++;
-        }
     }
     progreso.innerHTML = `Te quedaste con ${mano}.<br>La casa saca ${y} cartas y se queda con ${manoPc}`
-    if(mano<manoPc){
+    if(manoPc>21){
+        progreso.innerHTML =  `La casa se pasa con ${manoPc}. Ganaste!`
+        won++;
+        cont()
+    }else if(mano<manoPc && manoPc<21){
         miMano.innerHTML = `La casa gana con ${manoPc}`
         lost++
         cont();
