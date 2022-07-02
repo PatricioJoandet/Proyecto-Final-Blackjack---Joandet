@@ -27,11 +27,18 @@ const container = document.createElement("div")
 container.id = "container"
 let body = document.body
 let mazoApi = 0;
+let header = document.getElementById("header")
+let imgs = []
+let cartasImg = document.createElement("div");
 
 function noti(msg){
     Toastify({
         text: msg,
-        duration: 1500
+        duration: 1500,
+        style: {
+            background: "rgb(92,0,0)",
+            background: "linear-gradient(90deg, rgba(92,0,0,1) 0%, rgba(112,0,0,1) 10%, rgba(187,0,0,1) 79%, rgba(255,0,0,1) 100%)"
+        }
         }).showToast();
 }
 
@@ -52,7 +59,7 @@ function crearUser(){
     userCreatePass.placeholder = "Ingrese su contraseña"
     userCreate.type = "text"
     userCreatePass.type = "password"
-    body.insertBefore(container,body.firstChild)
+    header.appendChild(container)
     container.appendChild(userCreate)
     container.appendChild(userCreatePass)
     container.appendChild(btnCrear)
@@ -92,7 +99,7 @@ function login(){
     userLogin.placeholder = "Usuario"
     userPass.type = "password"
     userPass.placeholder= "Contraseña"    
-    body.insertBefore(container,body.firstChild)
+    header.appendChild(container)
     container.appendChild(userLogin)
     container.appendChild(userPass)
     container.appendChild(btnLogin)
@@ -113,6 +120,9 @@ function login(){
                     noti(`Ingreso correcto. Bienvenido/a ${users[j].nombre}`)
                     auth = true;
                     userId = j;
+                    nav.appendChild(logOut)
+                    nav.removeChild(btn1)
+                    nav.removeChild(btn2)
                     break;
                 }
             if(auth===false){
@@ -151,6 +161,7 @@ function recarga(){
 
 
 async function repartir(){
+    imgs=[]
     mano = 0;
     manoPc = 0;
     carta1 = 0;
@@ -197,6 +208,10 @@ async function repartir(){
     }
     manoPc = cartaPc + cartaPc2
     progreso.innerHTML = `Empieza el juego y se reparten las cartas.`
+    imgs.push(resp.cards[0].image)
+    imgs.push(resp.cards[1].image)
+    imgs.push(resp.cards[2].image)
+    imgs.push(resp.cards[3].image)
     
 }
  
@@ -258,46 +273,66 @@ async function quedarse(){
     }
 }
 
-
-
 async function jugar(){
     if(auth === false){
-        container.innerHTML = "Es necesario iniciar sesion para poder jugar"
-        body.insertBefore(container,body.firstChild)
-
-    }else{
+       noti("Es necesario iniciar sesion para poder jugar")
+    }else{ 
+        cartasImg.innerHTML = ``
+        miMano.innerHTML = ``
+        let i = 0
         btnPedir.disabled=false;
         btnQuedar.disabled=false;
         mano = 0;
         manoPc = 0;
         await repartir();
+        console.log(imgs)
         btnPedir.style.visibility = `visible`;
         btnQuedar.style.visibility = `visible`;
-        cartas.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}.<br> `;
-        miMano.innerHTML = `Tu mano es ${mano}.La casa tiene un ${cartaPc} y una carta oculta.`
-        
+        miMano.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}.<br> `;
+        cartas.appendChild(cartasImg)
+        imgs.forEach(element => {
+            if(i<2){
+                console.log(element)
+                let imgJugador = document.createElement("img")
+                imgJugador.width = 150
+                imgJugador.height.innerHTML = "auto"
+                imgJugador.src = imgs[i]
+                cartasImg.appendChild(imgJugador)
+                }
+            if(i>=2){
+                console.log(element)
+                let imgPc = document.createElement("img")
+                imgPc.width = 150
+                imgPc.height.innerHTML = "auto"
+                imgPc.src = imgs[i]
+                cartasImg.appendChild(imgPc)
+                }
+            i++    
+            });
+        }
         if(mano === 21){
             cartas.innerHTML = `Blackjack! Ganaste!`
             cont();
         }
     }
 
-}
 
 function cont(){
-    seguir.style.visibility= "visible"
+    body.appendChild(seguir)
+    body.appendChild(siNo)
 }
 
 function fin(){ 
-    p.innerHTML =`Victorias: ${won}
+    body.appendChild(stats)
+    stats.innerHTML =`<h2>Estadisticas:</h2>Victorias: ${won}
     Derrotas: ${lost}
     Empates: ${draw}`
 }
 
-let p = document.getElementById("stats");
+let stats = document.createElement("div");
 let nav = document.getElementById("nav");
-
-
+let logOut = document.createElement("button")
+logOut.innerHTML = `Cerrar sesión`
 let btn1 = document.createElement("button");
 let btn2 = document.createElement("button");
 let btn3 = document.createElement("button");
@@ -325,6 +360,13 @@ btnQuedar.style.visibility = `hidden`
 btnPedir.innerHTML = "Pedir";
 btnQuedar.innerHTML = "Quedarse";
 
+
+logOut.addEventListener("click", () =>{
+    auth= false;
+    nav.insertBefore(btn1,nav.firstChild)
+    nav.insertBefore(btn2, nav.firstChild)
+    nav.removeChild(logOut)
+})
 
 btnPedir.addEventListener("click", () =>{
     pedir();
@@ -371,21 +413,21 @@ btn4.addEventListener("click", () => {
     recarga();
 });
 
-
+let siNo = document.createElement("div")
 si.innerHTML = "Si";
 no.innerHTML = "No";
-seguir.appendChild(si);
-seguir.appendChild(no);
-botones.appendChild(seguir)
-seguir.style.visibility = `hidden`         
+siNo.appendChild(si)
+siNo.appendChild(no)         
 
 si.addEventListener("click", () =>{
-    seguir.style.visibility = "hidden"
+    body.removeChild(siNo)
+    body.removeChild(seguir)
     jugar()
 })
 
 no.addEventListener("click", () =>{
-    seguir.style.visibility = "hidden";
+    body.removeChild(siNo)
+    body.removeChild(seguir)
     fin();
 })
 
