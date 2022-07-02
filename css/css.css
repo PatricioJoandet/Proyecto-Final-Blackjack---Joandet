@@ -42,3 +42,11 @@ input{
 img{
     margin: 5px;
 }
+#infoIcon{
+    cursor: pointer;
+    position: absolute;
+    bottom: 0%;
+    left: 0%;
+    width: 50px;
+    height: auto;
+}

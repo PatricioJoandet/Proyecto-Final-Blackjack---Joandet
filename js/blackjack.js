@@ -29,7 +29,8 @@ let body = document.body
 let mazoApi = 0;
 let header = document.getElementById("header")
 let imgs = []
-let cartasImg = document.createElement("div");
+let imgUserDiv = document.createElement("div");
+let imgPcDiv = document.createElement("div");
 
 function noti(msg){
     Toastify({
@@ -219,6 +220,7 @@ async function pedir(){
     let call = await fetch(`https://deckofcardsapi.com/api/deck/${mazoApi.deck_id}/draw/?count=1`)
     let resp = await call.json()
     carta1 = resp.cards[0].value
+    imgs.push(resp.cards[0].image)
     if(carta1!= "JACK" && carta1 != "QUEEN" && carta1 != "KING" && carta1 != "ACE"){
         carta1= Number(carta1)
     }
@@ -226,9 +228,14 @@ async function pedir(){
         carta1 = 10;
     }
     mano+=carta1
+    let ult = imgs[imgs.length - 1]
     progreso.innerHTML = `Pediste una carta.`
-    cartas.innerHTML = `Sacaste un ${carta1}. `;
-    miMano.innerHTML = `Tu mano vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`
+    imgUserDiv.innerHTML += `<img src="${ult}" width = 100 height = auto>. `;
+    miMano.innerHTML = `Sacaste un ${carta1}. Tu mano ahora vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`
+    if(mano===21){
+        miMano.innerHTML = `Blackjack! Ganaste!`
+        cont()
+    }
     if(mano>21){
         progreso.innerHTML = `Te pasaste!`
         lost++
@@ -239,8 +246,8 @@ async function pedir(){
 }
 
 async function quedarse(){
+    
     let y = 0
-    cartas.innerHTML = ``
     for (y = 0;manoPc<17;y++){
         let call = await fetch(`https://deckofcardsapi.com/api/deck/${mazoApi.deck_id}/draw/?count=1`)
         let resp = await call.json()
@@ -276,8 +283,10 @@ async function quedarse(){
 async function jugar(){
     if(auth === false){
        noti("Es necesario iniciar sesion para poder jugar")
-    }else{ 
-        cartasImg.innerHTML = ``
+    }else{
+        imgPcDiv.innerHTML = ``
+        imgUserDiv.innerHTML = ``
+        cartas.innerHTML = ``
         miMano.innerHTML = ``
         let i = 0
         btnPedir.disabled=false;
@@ -288,24 +297,25 @@ async function jugar(){
         console.log(imgs)
         btnPedir.style.visibility = `visible`;
         btnQuedar.style.visibility = `visible`;
-        miMano.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}.<br> `;
-        cartas.appendChild(cartasImg)
+        miMano.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}. Tu mano vale ${mano} `;
+        cartas.appendChild(imgUserDiv)
+        cartas.appendChild(imgPcDiv)
         imgs.forEach(element => {
             if(i<2){
                 console.log(element)
                 let imgJugador = document.createElement("img")
-                imgJugador.width = 150
+                imgJugador.width = 100
                 imgJugador.height.innerHTML = "auto"
                 imgJugador.src = imgs[i]
-                cartasImg.appendChild(imgJugador)
+                imgUserDiv.appendChild(imgJugador)
                 }
-            if(i>=2){
+            if(i>2){
                 console.log(element)
                 let imgPc = document.createElement("img")
-                imgPc.width = 150
+                imgPc.width = 100
                 imgPc.height.innerHTML = "auto"
                 imgPc.src = imgs[i]
-                cartasImg.appendChild(imgPc)
+                imgPcDiv.appendChild(imgPc)
                 }
             i++    
             });
@@ -370,20 +380,6 @@ logOut.addEventListener("click", () =>{
 
 btnPedir.addEventListener("click", () =>{
     pedir();
-    if (mano === 21){
-        progreso.innerHTML = `Blackjack! Ganaste!`
-        btnPedir.disabled = true;
-        btnQuedar.disabled = true;
-        won++
-        cont();
-    }else if(mano>21){
-        progreso.innerHTML = `Te pasaste! Perdiste`
-        btnPedir.disabled = true;
-        btnQuedar.disabled = true;
-        lost++;
-        cont();
-    }
-
 })
 
 
@@ -431,7 +427,6 @@ no.addEventListener("click", () =>{
     fin();
 })
 
-
 const btnMode = document.createElement("button")
 btnMode.innerHTML = "Tema claro/Tema oscuro"
 nav.appendChild(btnMode);
@@ -463,4 +458,14 @@ btnMode.addEventListener("click", () =>{
         mode()
     }
 })
+
+let infoBtn = document.getElementById("infoIcon");
+infoBtn.addEventListener("click", ()=>{
+    Swal.fire({
+        title: '¿Como jugar?',
+        text: 'El objetivo del juego es alcanzar el valor 21, o lo más cercano posible sin pasarse. Si sacas 21, ganas automaticamente. Si la casa se pasa de 21, ganas. Si nadie se pasa de 21, o suma 21, gana el que tenga la mano de mayor valor',
+        icon: 'info',
+        confirmButtonText: 'Ok!'
+      })
+    })
 
