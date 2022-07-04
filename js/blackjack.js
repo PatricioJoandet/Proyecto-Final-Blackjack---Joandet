@@ -15,12 +15,10 @@ let auth = true;
 let i = 0;
 let userId = 0;
 let div = document.getElementById("botones");
-let progreso = document.getElementById("progreso")
 let cartas = document.getElementById("cartas");
-let miMano = document.getElementById("mano");
 let x = 0;
-let seguir = document.createElement("p");
-seguir.innerHTML = "¿Seguir jugando?";
+let seguir = document.createElement("div");
+seguir.innerHTML = `<p>¿Seguir jugando?</p>`;
 let si = document.createElement("button");
 let no = document.createElement("button");
 const container = document.createElement("div")
@@ -29,8 +27,14 @@ let body = document.body
 let mazoApi = 0;
 let header = document.getElementById("header")
 let imgs = []
-let imgUserDiv = document.createElement("div");
-let imgPcDiv = document.createElement("div");
+let cartasUserDiv = document.createElement("div");
+let cartasPcDiv = document.createElement("div");
+cartasPcDiv.classList.add("cartasBox")
+cartasUserDiv.classList.add("cartasBox")
+let imgUserDiv = document.createElement("div")
+let imgPcDiv = document.createElement("div")
+let conteo = document.createElement("p")
+let conteoPc = document.createElement("p")
 
 function noti(msg){
     Toastify({
@@ -176,7 +180,6 @@ async function repartir(){
     })
     let call = await fetch(`https://deckofcardsapi.com/api/deck/${mazoApi.deck_id}/draw/?count=4`)
     let resp = await call.json()
-    console.log(resp)
     carta1 = resp.cards[0].value
     if(carta1!= "JACK" && carta1 != "QUEEN" && carta1 != "KING" && carta1 != "ACE"){
         carta1= Number(carta1)
@@ -208,7 +211,7 @@ async function repartir(){
         cartaPc2 = 10;
     }
     manoPc = cartaPc + cartaPc2
-    progreso.innerHTML = `Empieza el juego y se reparten las cartas.`
+
     imgs.push(resp.cards[0].image)
     imgs.push(resp.cards[1].image)
     imgs.push(resp.cards[2].image)
@@ -229,15 +232,16 @@ async function pedir(){
     }
     mano+=carta1
     let ult = imgs[imgs.length - 1]
-    progreso.innerHTML = `Pediste una carta.`
-    imgUserDiv.innerHTML += `<img src="${ult}" width = 100 height = auto>. `;
-    miMano.innerHTML = `Sacaste un ${carta1}. Tu mano ahora vale ${mano}.<br>La casa tiene un ${cartaPc} y una carta oculta.`
+    conteo.innerHTML = `Sacaste un ${carta1}. Tu mano ahora vale ${mano}`
+    imgUserDiv.innerHTML += `<img src="${ult}" width = 100 height = auto>`;
     if(mano===21){
-        miMano.innerHTML = `Blackjack! Ganaste!`
+        cartasUserDiv.classList.add("won")
+        cartasPcDiv.classList.add("lose")
         cont()
     }
     if(mano>21){
-        progreso.innerHTML = `Te pasaste!`
+        cartasUserDiv.classList.add("lose")
+        cartasPcDiv.classList.add("won")
         lost++
         btnPedir.disabled = true;
         btnQuedar.disabled = true;
@@ -246,12 +250,13 @@ async function pedir(){
 }
 
 async function quedarse(){
-    
     let y = 0
     for (y = 0;manoPc<17;y++){
+        console.log(imgs.length)
         let call = await fetch(`https://deckofcardsapi.com/api/deck/${mazoApi.deck_id}/draw/?count=1`)
         let resp = await call.json()
         cartaPc = resp.cards[0].value
+        imgPcDiv.innerHTML += `<img src="${resp.cards[0].image}" width = 100 height = auto>`
         if(cartaPc!= "JACK" && cartaPc != "QUEEN" && cartaPc != "KING" && cartaPc != "ACE"){
             cartaPc= Number(cartaPc)
         }
@@ -260,22 +265,36 @@ async function quedarse(){
         }
         manoPc+=cartaPc;
     }
-    progreso.innerHTML = `Te quedaste con ${mano}.<br>La casa saca ${y} cartas y se queda con ${manoPc}`
+    console.log(cartaPc2)
+    console.log(cartaPc)
+    conteoPc.innerHTML = `La casa sacó ${y} cartas y se quedó con ${manoPc}`
+    imgPcDiv.innerHTML += `<img src="${imgs[3]}" width = 100 height = auto>`
+
+
     if(manoPc>21){
-        progreso.innerHTML =  `La casa se pasa con ${manoPc}. Ganaste!`
+        cartasPcDiv.classList.add("lose")
+        cartasUserDiv.classList.add("won")
         won++;
         cont()
     }else if(mano<manoPc && manoPc<21){
-        miMano.innerHTML = `La casa gana con ${manoPc}`
+        cartasPcDiv.classList.add("won")
+        cartasUserDiv.classList.add("lose")
         lost++
         cont();
     }else if(mano === manoPc){
-        miMano.innerHTML = `Empate`
+        cartasPcDiv.classList.add("won")
+        cartasUserDiv.classList.add("won")
         draw++;
         cont()
     }else if(mano>manoPc && mano<21){
-        miMano.innerHTML= `Ganaste!`
+        cartasPcDiv.classList.add("lose")
+        cartasUserDiv.classList.add("won")
         won++
+        cont()
+    }else if(manoPc === 21){
+        cartasPcDiv.classList.add("won")
+        cartasUserDiv.classList.add("lose")
+        lost++
         cont()
     }
 }
@@ -284,37 +303,46 @@ async function jugar(){
     if(auth === false){
        noti("Es necesario iniciar sesion para poder jugar")
     }else{
-        imgPcDiv.innerHTML = ``
+        cartasPcDiv.classList.remove("won", "lose")
+        cartasUserDiv.classList.remove("won", "lose")
+        seguir.remove()
+        stats.remove()
+        cartasPcDiv.innerHTML = ``
+        cartasUserDiv.innerHTML = ``
         imgUserDiv.innerHTML = ``
+        imgPcDiv.innerHTML = ``
         cartas.innerHTML = ``
-        miMano.innerHTML = ``
         let i = 0
         btnPedir.disabled=false;
         btnQuedar.disabled=false;
         mano = 0;
         manoPc = 0;
         await repartir();
-        console.log(imgs)
         btnPedir.style.visibility = `visible`;
         btnQuedar.style.visibility = `visible`;
-        miMano.innerHTML = `<b>Tus cartas:</b> ${carta1} y ${carta2}. Tu mano vale ${mano} `;
-        cartas.appendChild(imgUserDiv)
-        cartas.appendChild(imgPcDiv)
+        cartas.appendChild(cartasPcDiv)
+        cartas.appendChild(cartasUserDiv)
+        cartasPcDiv.innerHTML = `<h2>Cartas de la casa </h2>`
+        cartasUserDiv.innerHTML = `<h2>Tus cartas</h2>`
+        cartasPcDiv.appendChild(conteoPc)
+        cartasUserDiv.appendChild(conteo)
+        cartasPcDiv.appendChild(imgPcDiv)
+        cartasUserDiv.appendChild(imgUserDiv)
+        conteo.innerHTML = `Tu mano vale ${mano}`
+        conteoPc.innerHTML = `${cartaPc} y una carta oculta.`
         imgs.forEach(element => {
             if(i<2){
-                console.log(element)
                 let imgJugador = document.createElement("img")
                 imgJugador.width = 100
                 imgJugador.height.innerHTML = "auto"
-                imgJugador.src = imgs[i]
+                imgJugador.src = element
                 imgUserDiv.appendChild(imgJugador)
                 }
-            if(i>2){
-                console.log(element)
+            if(i==2){
                 let imgPc = document.createElement("img")
                 imgPc.width = 100
                 imgPc.height.innerHTML = "auto"
-                imgPc.src = imgs[i]
+                imgPc.src = element
                 imgPcDiv.appendChild(imgPc)
                 }
             i++    
@@ -329,7 +357,6 @@ async function jugar(){
 
 function cont(){
     body.appendChild(seguir)
-    body.appendChild(siNo)
 }
 
 function fin(){ 
@@ -386,7 +413,6 @@ btnPedir.addEventListener("click", () =>{
 btnQuedar.addEventListener("click", () =>{
     btnPedir.disabled = true;
     btnQuedar.disabled = true;
-    progreso.innerHTML = `Te quedaste`
     quedarse()
 })
 
@@ -409,20 +435,19 @@ btn4.addEventListener("click", () => {
     recarga();
 });
 
-let siNo = document.createElement("div")
 si.innerHTML = "Si";
 no.innerHTML = "No";
-siNo.appendChild(si)
-siNo.appendChild(no)         
+seguir.appendChild(si)
+seguir.appendChild(no)         
 
 si.addEventListener("click", () =>{
-    body.removeChild(siNo)
     body.removeChild(seguir)
+    cartasUserDiv.classList.remove("won", "lose")
+    cartasPcDiv.classList.remove("won", "lose")
     jugar()
 })
 
 no.addEventListener("click", () =>{
-    body.removeChild(siNo)
     body.removeChild(seguir)
     fin();
 })
@@ -435,7 +460,6 @@ document.body.classList.add(localStorage.getItem("tema"))
 
 function mode(){
     let tema = localStorage.getItem("tema")
-    console.log("a")
 }
 
 btnMode.addEventListener("click", () =>{
