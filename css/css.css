@@ -44,7 +44,7 @@ img{
 }
 #infoIcon{
     cursor: pointer;
-    position: absolute;
+    position: fixed;
     bottom: 0%;
     left: 0%;
     width: 50px;
@@ -102,4 +102,10 @@ p{
 
 #user{
     margin: 5px;
+}
+
+#simb{
+    position: relative;
+    bottom: 0%;
+    margin-bottom: 10px;
 }
