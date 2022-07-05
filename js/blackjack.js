@@ -14,7 +14,7 @@ const users = [];
 let auth = true;
 let i = 0;
 let userId = 0;
-let div = document.getElementById("botones");
+let botones = document.getElementById("botones");
 let cartas = document.getElementById("cartas");
 let x = 0;
 let seguir = document.createElement("div");
@@ -35,6 +35,8 @@ let imgUserDiv = document.createElement("div")
 let imgPcDiv = document.createElement("div")
 let conteo = document.createElement("p")
 let conteoPc = document.createElement("p")
+let userData = document.getElementById("user")
+let bets = document.getElementById("bets")
 
 function noti(msg){
     Toastify({
@@ -126,8 +128,9 @@ function login(){
                     auth = true;
                     userId = j;
                     nav.appendChild(logOut)
-                    nav.removeChild(btn1)
-                    nav.removeChild(btn2)
+                    nav.removeChild(btnIniciar)
+                    nav.removeChild(btnNew)
+                    userData.innerHTML = `<b>Usuario:</b> ${users[j].nombre} <b>Fichas:</b> ${users[j].fichas}`
                     break;
                 }
             if(auth===false){
@@ -152,12 +155,13 @@ function recarga(){
         const cargaInput = document.createElement("input")
         cargar.innerHTML = "Cargar"
         cargaInput.placeholder= "Cantidad de fichas a cargar"    
-        body.insertBefore(container,body.firstChild)
+        header.appendChild(container)
         container.appendChild(cargaInput)
         container.appendChild(cargar)
         cargar.addEventListener("click",()=>{
             carga = Number(cargaInput.value)
             users[userId].fichas+=carga;
+            userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
             noti(`Ahora tenes ${users[userId].fichas}. Suerte!`);
             container.remove()
         })
@@ -237,6 +241,10 @@ async function pedir(){
     if(mano===21){
         cartasUserDiv.classList.add("won")
         cartasPcDiv.classList.add("lose")
+        btnPedir.disabled = true;
+        btnQuedar.disabled = true;
+        users[userId].fichas+=bet*2
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
         cont()
     }
     if(mano>21){
@@ -245,11 +253,13 @@ async function pedir(){
         lost++
         btnPedir.disabled = true;
         btnQuedar.disabled = true;
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
         cont()
     }
 }
 
 async function quedarse(){
+    imgPcDiv.innerHTML += `<img src="${imgs[3]}" width = 100 height = auto>`
     let y = 0
     for (y = 0;manoPc<17;y++){
         console.log(imgs.length)
@@ -268,43 +278,94 @@ async function quedarse(){
     console.log(cartaPc2)
     console.log(cartaPc)
     conteoPc.innerHTML = `La casa sacó ${y} cartas y se quedó con ${manoPc}`
-    imgPcDiv.innerHTML += `<img src="${imgs[3]}" width = 100 height = auto>`
-
-
     if(manoPc>21){
         cartasPcDiv.classList.add("lose")
         cartasUserDiv.classList.add("won")
+        users[userId].fichas+=bet*2
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
         won++;
         cont()
     }else if(mano<manoPc && manoPc<21){
         cartasPcDiv.classList.add("won")
         cartasUserDiv.classList.add("lose")
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
         lost++
         cont();
     }else if(mano === manoPc){
         cartasPcDiv.classList.add("won")
         cartasUserDiv.classList.add("won")
+        users[userId].fichas+=bet
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
+
         draw++;
         cont()
     }else if(mano>manoPc && mano<21){
         cartasPcDiv.classList.add("lose")
         cartasUserDiv.classList.add("won")
+        users[userId].fichas+=bet*2
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
         won++
         cont()
     }else if(manoPc === 21){
         cartasPcDiv.classList.add("won")
         cartasUserDiv.classList.add("lose")
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
         lost++
         cont()
     }
+}
+
+
+let betting = document.createElement("div")
+
+function apuesta(){
+    bet = 0;
+    console.log(users[userId])
+    container.innerHTML = ``
+    let betInput = document.createElement("input");
+    betInput.placeholder = `Fichas a apostar`
+    const ok = document.createElement("button")
+    ok.innerHTML = "Apostar"
+    container.appendChild(betInput)
+    container.appendChild(ok)
+    bets.appendChild(container)
+    ok.addEventListener("click", () =>{
+        if(Number(betInput.value)>users[userId].fichas){
+            noti("No tenes saldo suficiente. Hace una recarga.")
+        }else if(Number(betInput.value)<=0 || isNaN(betInput.value)){
+            noti("Apuesta invalida")
+            apuesta();
+        }else{
+            bet = Number(betInput.value);
+            users[userId].fichas-=bet
+            userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
+            console.log(users[userId])
+            container.remove()
+            betting.innerHTML = `<p>Apuestas: ${bet}</p> `
+        }
+    })
 }
 
 async function jugar(){
     if(auth === false){
        noti("Es necesario iniciar sesion para poder jugar")
     }else{
+        mano = 0
+        manoPc = 0
+        cartaPc = 0;
+        bet= 0;
+        btnDeal.disabled=false;
+        btnBet.disabled=false;
+        botones.appendChild(btnBet)
+        botones.appendChild(btnDeal)
+        botones.appendChild(btnPedir);
+        botones.appendChild(btnQuedar);
+        bets.classList.add("betsBox")
         cartasPcDiv.classList.remove("won", "lose")
         cartasUserDiv.classList.remove("won", "lose")
+        bets.innerHTML = `<h2>Apuestas</h2>`
+        betting.innerHTML = `<p>Apuestas: ${bet}</p>`
+        bets.appendChild(betting)
         seguir.remove()
         stats.remove()
         cartasPcDiv.innerHTML = ``
@@ -312,14 +373,12 @@ async function jugar(){
         imgUserDiv.innerHTML = ``
         imgPcDiv.innerHTML = ``
         cartas.innerHTML = ``
-        let i = 0
-        btnPedir.disabled=false;
-        btnQuedar.disabled=false;
         mano = 0;
         manoPc = 0;
+        btnPedir.disabled = true;
+        btnQuedar.disabled = true;
+        let i = 0
         await repartir();
-        btnPedir.style.visibility = `visible`;
-        btnQuedar.style.visibility = `visible`;
         cartas.appendChild(cartasPcDiv)
         cartas.appendChild(cartasUserDiv)
         cartasPcDiv.innerHTML = `<h2>Cartas de la casa </h2>`
@@ -328,28 +387,12 @@ async function jugar(){
         cartasUserDiv.appendChild(conteo)
         cartasPcDiv.appendChild(imgPcDiv)
         cartasUserDiv.appendChild(imgUserDiv)
-        conteo.innerHTML = `Tu mano vale ${mano}`
-        conteoPc.innerHTML = `${cartaPc} y una carta oculta.`
-        imgs.forEach(element => {
-            if(i<2){
-                let imgJugador = document.createElement("img")
-                imgJugador.width = 100
-                imgJugador.height.innerHTML = "auto"
-                imgJugador.src = element
-                imgUserDiv.appendChild(imgJugador)
-                }
-            if(i==2){
-                let imgPc = document.createElement("img")
-                imgPc.width = 100
-                imgPc.height.innerHTML = "auto"
-                imgPc.src = element
-                imgPcDiv.appendChild(imgPc)
-                }
-            i++    
-            });
         }
         if(mano === 21){
             cartas.innerHTML = `Blackjack! Ganaste!`
+            users[userId].fichas+=bet*2
+
+            won++;
             cont();
         }
     }
@@ -370,38 +413,63 @@ let stats = document.createElement("div");
 let nav = document.getElementById("nav");
 let logOut = document.createElement("button")
 logOut.innerHTML = `Cerrar sesión`
-let btn1 = document.createElement("button");
-let btn2 = document.createElement("button");
-let btn3 = document.createElement("button");
-let btn4 = document.createElement("button");
+let btnIniciar = document.createElement("button");
+let btnNew = document.createElement("button");
+let btnPlay = document.createElement("button");
+let btnRec = document.createElement("button");
 
-btn1.innerHTML = "Login";
-btn2.innerHTML = "Sign Up";
-btn3.innerHTML = "Jugar";
-btn4.innerHTML = "Recarga";
+btnIniciar.innerHTML = "Login";
+btnNew.innerHTML = "Sign Up";
+btnPlay.innerHTML = "Jugar";
+btnRec.innerHTML = "Recarga";
 
-nav.appendChild(btn1);
-nav.appendChild(btn2);
-nav.appendChild(btn3);
-nav.appendChild(btn4);
+nav.appendChild(btnIniciar);
+nav.appendChild(btnNew);
+nav.appendChild(btnPlay);
+nav.appendChild(btnRec);
 
 let btnPedir = document.createElement("button");
 let btnQuedar = document.createElement("button");
-
-div.appendChild(btnPedir);
-div.appendChild(btnQuedar);
-
-btnPedir.style.visibility = `hidden`
-btnQuedar.style.visibility = `hidden`
+let btnBet = document.createElement("button")
+let btnDeal = document.createElement("button")
 
 btnPedir.innerHTML = "Pedir";
 btnQuedar.innerHTML = "Quedarse";
+btnBet.innerHTML = `Apostar`;
+btnDeal.innerHTML = `Repartir`;
 
+btnDeal.addEventListener("click", () =>{
+    btnBet.disabled = true;
+    btnDeal.disabled = true;
+    btnPedir.disabled = false
+    btnQuedar.disabled = false
+    let i = 0;
+    conteo.innerHTML = `Tu mano vale ${mano}`
+    conteoPc.innerHTML = `${cartaPc} y una carta oculta.`
+    imgs.forEach(element => {
+        if(i<2){
+            let imgJugador = document.createElement("img")
+            imgJugador.width = 100
+            imgJugador.height.innerHTML = "auto"
+            imgJugador.src = element
+            imgUserDiv.appendChild(imgJugador)
+            }
+        if(i==2){
+            let imgPc = document.createElement("img")
+            imgPc.width = 100
+            imgPc.height.innerHTML = "auto"
+            imgPc.src = element
+            imgPcDiv.appendChild(imgPc)
+            }
+        i++    
+        });
+})
 
 logOut.addEventListener("click", () =>{
     auth= false;
-    nav.insertBefore(btn1,nav.firstChild)
-    nav.insertBefore(btn2, nav.firstChild)
+    userData.innerHTML = ``
+    nav.insertBefore(btnIniciar,nav.firstChild)
+    nav.insertBefore(btnNew, nav.firstChild)
     nav.removeChild(logOut)
 })
 
@@ -416,21 +484,25 @@ btnQuedar.addEventListener("click", () =>{
     quedarse()
 })
 
-btn1.addEventListener("click", () => {
+btnBet.addEventListener("click", ()=>{
+    apuesta();
+})
+
+btnIniciar.addEventListener("click", () => {
     container.innerHTML= ""
     login();
 });
 
-btn2.addEventListener("click", () => {
+btnNew.addEventListener("click", () => {
     container.innerHTML= ""
     crearUser();
 });
 
-btn3.addEventListener("click", () => {
+btnPlay.addEventListener("click", () => {
     jugar();
 });
 
-btn4.addEventListener("click", () => {
+btnRec.addEventListener("click", () => {
     container.innerHTML= ""
     recarga();
 });
