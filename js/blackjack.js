@@ -350,6 +350,8 @@ async function jugar(){
     if(auth === false){
        noti("Es necesario iniciar sesion para poder jugar")
     }else{
+        conteo.innerHTML = ``
+        conteoPc.innerHTML = ``
         mano = 0
         manoPc = 0
         cartaPc = 0;
