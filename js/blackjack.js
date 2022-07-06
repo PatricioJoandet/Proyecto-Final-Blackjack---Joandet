@@ -7,7 +7,6 @@ let manoPc = 0;
 let won = 0;
 let lost = 0;
 let draw = 0;
-let pos = 0;
 let bet = 0;
 let user;
 const users = [];
@@ -16,7 +15,6 @@ let i = 0;
 let userId = 0;
 let botones = document.getElementById("botones");
 let cartas = document.getElementById("cartas");
-let x = 0;
 let seguir = document.createElement("div");
 let si = document.createElement("button");
 let no = document.createElement("button");
@@ -48,7 +46,7 @@ const btnDeal = document.createElement("button")
 const btnMode = document.createElement("button")
 let betting = document.createElement("div")
 let infoBtn = document.getElementById("infoIcon");
-
+let ganancia = 0;
 
 btnIniciar.innerHTML = "Login";
 btnNew.innerHTML = "Sign Up";
@@ -101,10 +99,11 @@ function notiOk(msg){
 }
 
 class User{
-    constructor(nombre, pass, fichas){
+    constructor(nombre, pass, fichas, ganancia){
         this.nombre = nombre;
         this.pass = pass;
         this.fichas = fichas;
+        this.ganancia = ganancia;
     }
 }
 
@@ -121,14 +120,12 @@ function crearUser(){
     container.appendChild(userCreate)
     container.appendChild(userCreatePass)
     container.appendChild(btnCrear)
-    const ok = document.createElement("button")
-    ok.innerHTML = "Continuar"
     btnCrear.addEventListener("click", ()=>{
 
         if(userCreate.value === "" || userCreatePass.value === ""){
             notiError(`Error de registro, intentelo nuevamente`); 
         }else{
-            users[i] = new User(userCreate.value,userCreatePass.value,100)
+            users[i] = new User(userCreate.value,userCreatePass.value,100,0)
             i++;
             userCreate.remove()
             userCreatePass.remove()
@@ -169,7 +166,7 @@ function login(){
                     nav.appendChild(logOut);
                     nav.removeChild(btnIniciar);
                     nav.removeChild(btnNew);
-                    userData.innerHTML = `<b>Usuario:</b> ${users[j].nombre} <b>Fichas:</b> ${users[j].fichas}`;
+                    userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
                     break;
                 }
             if(auth===false){
@@ -203,7 +200,7 @@ function recarga(){
                 notiError("Ingrese un monto valido")
             }else{
                 users[userId].fichas+=carga;
-                userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`;
+                userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
                 notiOk(`Ahora tenes ${users[userId].fichas}. Suerte!`);
                 container.remove();}
         })
@@ -285,7 +282,8 @@ async function pedir(){
         btnPedir.disabled = true;
         btnQuedar.disabled = true;
         users[userId].fichas+=bet*2;
-        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
+        users[userId].ganancia+=bet;
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
         cont();
     }
     if(mano>21){
@@ -294,7 +292,8 @@ async function pedir(){
         lost++;
         btnPedir.disabled = true;
         btnQuedar.disabled = true;
-        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`;
+        users[userId].ganancia-=bet;
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
         cont();
     }
 }
@@ -302,8 +301,7 @@ async function pedir(){
 async function quedarse(){
     imgPcDiv.innerHTML += `<img src="${imgs[3]}" width = 100 height = auto>`;
     let y = 0;
-    for (y = 0;manoPc<17;y++){
-        console.log(imgs.length);
+    for (y = 0;manoPc<17 && manoPc<mano;y++){
         let call = await fetch(`https://deckofcardsapi.com/api/deck/${mazoApi.deck_id}/draw/?count=1`);
         let resp = await call.json();
         cartaPc = resp.cards[0].value;
@@ -316,40 +314,46 @@ async function quedarse(){
         }
         manoPc+=cartaPc;
     }
-    console.log(cartaPc2);
-    console.log(cartaPc);
-    conteoPc.innerHTML = `La casa sacó ${y} cartas y se quedó con ${manoPc}`
+    if(y===0){
+        conteoPc.innerHTML = `La casa se quedó con ${manoPc}`
+    }else{
+        conteoPc.innerHTML = `La casa sacó ${y} cartas y se quedó con ${manoPc}`
+    }
     if(manoPc>21){
         cartasPcDiv.classList.add("lose");
         cartasUserDiv.classList.add("won");
         users[userId].fichas+=bet*2;
-        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
+        users[userId].ganancia+=bet
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
         won++;
         cont();
     }else if(mano<manoPc && manoPc<21){
         cartasPcDiv.classList.add("won");
         cartasUserDiv.classList.add("lose");
-        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
+        users[userId].ganancia-=bet
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
         lost++;
         cont();
     }else if(mano === manoPc){
         cartasPcDiv.classList.add("won");
         cartasUserDiv.classList.add("won");
         users[userId].fichas+=bet;
-        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
         draw++;
         cont();
     }else if(mano>manoPc && mano<21){
         cartasPcDiv.classList.add("lose");
         cartasUserDiv.classList.add("won");
         users[userId].fichas+=bet*2;
-        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`;
+        users[userId].ganancia+=bet
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
         won++;
         cont();
     }else if(manoPc === 21){
         cartasPcDiv.classList.add("won");
         cartasUserDiv.classList.add("lose");
-        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`;
+        users[userId].ganancia-=bet
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
         lost++;
         cont();
     }
@@ -357,7 +361,6 @@ async function quedarse(){
 
 function apuesta(){
     bet = 0;
-    console.log(users[userId]);
     container.innerHTML = ``;
     let betInput = document.createElement("input");
     betInput.placeholder = `Fichas a apostar`;
@@ -375,8 +378,7 @@ function apuesta(){
         }else{
             bet = Number(betInput.value);
             users[userId].fichas-=bet;
-            userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas}`
-            console.log(users[userId]);
+            userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
             container.remove();
             betting.innerHTML = `<p>Apuestas: ${bet}</p> `;
         }
@@ -429,6 +431,7 @@ async function jugar(){
         if(mano === 21){
             cartas.innerHTML = `Blackjack! Ganaste!`;
             users[userId].fichas+=bet*2;
+            userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
             won++;
             cont();
         }
