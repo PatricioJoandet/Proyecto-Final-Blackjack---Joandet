@@ -48,6 +48,8 @@ let betting = document.createElement("div")
 let infoBtn = document.getElementById("infoIcon");
 let ganancia = 0;
 let newDeck = true;
+let aceCount = 0;
+let aceCountPc = 0;
 
 btnIniciar.innerHTML = "Login";
 btnNew.innerHTML = "Sign Up";
@@ -215,6 +217,8 @@ async function repartir(){
     carta2 = 0;
     cartaPc = 0;
     cartaPc2  = 0;
+    aceCount= 0;
+    aceCountPc= 0;
     if(newDeck){
         await fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
         .then(resp => resp.json())
@@ -246,7 +250,13 @@ async function repartir(){
     if(carta2 === "JACK" || carta2 === "QUEEN" || carta2 === "KING"){
         carta2 = 10;
     }
+    if(carta1 === "ACE" && carta2 === "ACE"){
+        carta1 = 11
+        carta2 = 1
+        aceCount++
+    }
     if(carta1 === "ACE" || carta2 === "ACE"){
+        aceCount++
         if(carta1==="ACE"){
             if(carta2+11>21){
                 carta1 = 1
@@ -267,16 +277,38 @@ async function repartir(){
     if(cartaPc!= "JACK" && cartaPc != "QUEEN" && cartaPc != "KING" && cartaPc != "ACE"){
         cartaPc= Number(cartaPc);
     }
-    if(cartaPc === "JACK" || cartaPc === "QUEEN" || cartaPc === "KING" || cartaPc === "ACE"){
+    if(cartaPc === "JACK" || cartaPc === "QUEEN" || cartaPc === "KING"){
         cartaPc = 10;
     }
     cartaPc2 = resp.cards[3].value;
     if(cartaPc2!= "JACK" && cartaPc2 != "QUEEN" && cartaPc2 != "KING" && cartaPc2 != "ACE"){
         cartaPc2= Number(cartaPc2);
     }
-    if(cartaPc2 === "JACK" || cartaPc2 === "QUEEN" || cartaPc2 === "KING" || cartaPc2 === "ACE"){
+    if(cartaPc2 === "JACK" || cartaPc2 === "QUEEN" || cartaPc2 === "KING"){
         cartaPc2 = 10;
     }
+    if(cartaPc === "ACE" && cartaPc2 === "ACE"){
+        cartaPc = 11
+        cartaPc2 = 1
+        aceCountPc++
+    }
+    if(cartaPc === "ACE" || cartaPc2 === "ACE"){
+        aceCountPc++
+        if(cartaPc==="ACE"){
+            if(cartaPc2+11>21){
+                cartaPc = 1
+            }else{
+                cartaPc = 11
+            }
+        }else{
+            if(cartaPc+11>21){
+                cartaPc2 = 1
+            }else{
+                cartaPc2 = 11
+            }
+        }
+    }
+
     manoPc = cartaPc + cartaPc2;
 
     imgs.push(resp.cards[0].image);
@@ -298,7 +330,9 @@ async function pedir(){
         carta1 = 10;
     }
     if(carta1 === "ACE"){
-        if(mano+11>21){
+        if(aceCount!=0){
+            carta1 = 1
+        }else if(mano+11>21){
             carta1 = 1
         }else{
             carta1 = 11
@@ -343,8 +377,17 @@ async function quedarse(){
         if(cartaPc!= "JACK" && cartaPc != "QUEEN" && cartaPc != "KING" && cartaPc != "ACE"){
             cartaPc= Number(cartaPc);
         }
-        if(cartaPc === "JACK" || cartaPc === "QUEEN" || cartaPc === "KING" || cartaPc === "ACE"){
+        if(cartaPc === "JACK" || cartaPc === "QUEEN" || cartaPc === "KING"){
             cartaPc = 10;
+        }
+        if(cartaPc === "ACE"){
+            if(aceCountPc!=0){
+                cartaPc = 1
+            }else if(manoPc+11>21){
+                cartaPc = 1
+            }else{
+                cartaPc = 11
+            }
         }
         manoPc+=cartaPc;
     }
