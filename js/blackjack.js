@@ -10,7 +10,7 @@ let draw = 0;
 let bet = 0;
 let user;
 const users = [];
-let auth = false;
+let auth = true;
 let i = 0;
 let userId = 0;
 let botones = document.getElementById("botones");
@@ -226,15 +226,31 @@ async function repartir(){
     if(carta1!= "JACK" && carta1 != "QUEEN" && carta1 != "KING" && carta1 != "ACE"){
         carta1= Number(carta1);
     }
-    if(carta1 === "JACK" || carta1 === "QUEEN" || carta1 === "KING" || carta1 === "ACE"){
+    if(carta1 === "JACK" || carta1 === "QUEEN" || carta1 === "KING"){
         carta1 = 10;
     }
+
     carta2 = resp.cards[1].value;
     if(carta2 != "JACK" && carta2 != "QUEEN" && carta2 != "KING" && carta2 != "ACE"){
         carta2= Number(carta2);
     }
-    if(carta2 === "JACK" || carta2 === "QUEEN" || carta2 === "KING" || carta2 === "ACE"){
+    if(carta2 === "JACK" || carta2 === "QUEEN" || carta2 === "KING"){
         carta2 = 10;
+    }
+    if(carta1 === "ACE" || carta2 === "ACE"){
+        if(carta1==="ACE"){
+            if(carta2+11>21){
+                carta1 = 1
+            }else{
+                carta1 = 11
+            }
+        }else{
+            if(carta1+11>21){
+                carta2 = 1
+            }else{
+                carta2 = 11
+            }
+        }
     }
     mano = carta1 + carta2;
 
@@ -269,9 +285,17 @@ async function pedir(){
     if(carta1!= "JACK" && carta1 != "QUEEN" && carta1 != "KING" && carta1 != "ACE"){
         carta1= Number(carta1);
     }
-    if(carta1 === "JACK" || carta1 === "QUEEN" || carta1 === "KING" || carta1 === "ACE"){
+    if(carta1 === "JACK" || carta1 === "QUEEN" || carta1 === "KING"){
         carta1 = 10;
     }
+    if(carta1 === "ACE"){
+        if(mano+11>21){
+            carta1 = 1
+        }else{
+            carta1 = 11
+        }
+    }
+
     mano+=carta1
     let ult = imgs[imgs.length - 1];
     conteo.innerHTML = `Sacaste un ${carta1}. Tu mano ahora vale ${mano}`;
@@ -283,6 +307,7 @@ async function pedir(){
         btnQuedar.disabled = true;
         users[userId].fichas+=bet*2;
         users[userId].ganancia+=bet;
+        won++;
         userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
         cont();
     }
@@ -418,7 +443,6 @@ async function jugar(){
         manoPc = 0;
         btnPedir.disabled = true;
         btnQuedar.disabled = true;
-        await repartir();
         cartas.appendChild(cartasPcDiv);
         cartas.appendChild(cartasUserDiv);
         cartasPcDiv.innerHTML = `<h2>Cartas de la casa </h2>`;
@@ -427,13 +451,6 @@ async function jugar(){
         cartasUserDiv.appendChild(conteo);
         cartasPcDiv.appendChild(imgPcDiv);
         cartasUserDiv.appendChild(imgUserDiv);
-        }
-        if(mano === 21){
-            cartas.innerHTML = `Blackjack! Ganaste!`;
-            users[userId].fichas+=bet*2;
-            userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
-            won++;
-            cont();
         }
 }
 
@@ -452,14 +469,13 @@ function mode(){
     let tema = localStorage.getItem("tema");
 }
 
-btnDeal.addEventListener("click", () =>{
+btnDeal.addEventListener("click", async () =>{
     btnBet.disabled = true;
     btnDeal.disabled = true;
     btnPedir.disabled = false;
     btnQuedar.disabled = false;
     let i = 0;
-    conteo.innerHTML = `Tu mano vale ${mano}`;
-    conteoPc.innerHTML = `${cartaPc} y una carta oculta.`;
+    await repartir()
     imgs.forEach(element => {
         if(i<2){
             let imgJugador = document.createElement("img");
@@ -477,6 +493,18 @@ btnDeal.addEventListener("click", () =>{
             }
         i++;
         });
+    conteo.innerHTML = `Tu mano vale ${mano}`;
+    conteoPc.innerHTML = `${cartaPc} y una carta oculta.`;  
+    if(mano === 21){
+        conteo.innerHTML = `Blackjack! Ganaste!`
+        cartasPcDiv.classList.add("lose");
+        cartasUserDiv.classList.add("won");
+        users[userId].fichas+=bet*3;
+        users[userId].ganancia+=bet*2
+        userData.innerHTML = `<b>Usuario:</b> ${users[userId].nombre} <b>Fichas:</b> ${users[userId].fichas} <b>Ganancias:</b> ${users[userId].ganancia}`;
+        won++;
+        cont();
+    }  
 })
 
 logOut.addEventListener("click", () =>{
