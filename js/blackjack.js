@@ -62,7 +62,6 @@ si.innerHTML = "Si";
 no.innerHTML = "No";
 btnMode.innerHTML = "Tema claro/Tema oscuro";
 
-
 nav.appendChild(btnIniciar);
 nav.appendChild(btnNew);
 nav.appendChild(btnPlay);
