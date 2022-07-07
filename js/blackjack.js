@@ -47,6 +47,7 @@ const btnMode = document.createElement("button")
 let betting = document.createElement("div")
 let infoBtn = document.getElementById("infoIcon");
 let ganancia = 0;
+let newDeck = true;
 
 btnIniciar.innerHTML = "Login";
 btnNew.innerHTML = "Sign Up";
@@ -214,11 +215,20 @@ async function repartir(){
     carta2 = 0;
     cartaPc = 0;
     cartaPc2  = 0;
-    await fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
-    .then(resp => resp.json())
-    .then(data =>{
-    mazoApi=data;
-    })
+    if(newDeck){
+        await fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
+        .then(resp => resp.json())
+        .then(data =>{
+        mazoApi=data;
+        })
+        newDeck = false;
+    }else{
+        await fetch(`https://www.deckofcardsapi.com/api/deck/${mazoApi.deck_id}/shuffle/`)
+        .then(resp => resp.json())
+        .then(data =>{
+        mazoApi=data;
+        })
+    }
     let call = await fetch(`https://deckofcardsapi.com/api/deck/${mazoApi.deck_id}/draw/?count=4`)
     let resp = await call.json()
     carta1 = resp.cards[0].value
@@ -517,6 +527,7 @@ logOut.addEventListener("click", () =>{
     nav.insertBefore(btnIniciar,nav.firstChild);
     nav.insertBefore(btnNew, nav.firstChild);
     nav.removeChild(logOut);
+    newDeck=true;
 })
 
 btnPedir.addEventListener("click", () =>{
@@ -561,6 +572,7 @@ si.addEventListener("click", () =>{
 
 no.addEventListener("click", () =>{
     body.removeChild(seguir);
+    newDeck=true;
     fin();
 })
 
