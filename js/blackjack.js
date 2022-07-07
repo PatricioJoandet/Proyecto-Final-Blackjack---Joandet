@@ -445,9 +445,9 @@ async function jugar(){
         stats.remove();
         cartasPcDiv.innerHTML = ``;
         cartasUserDiv.innerHTML = ``;
-        imgUserDiv.innerHTML = ``;
-        imgPcDiv.innerHTML = ``;
-        cartas.innerHTML = ``;
+        imgUserDiv.innerHTML = `<img src="img/carta.png" width = 100 height = auto>`;
+        imgPcDiv.innerHTML = `<img src="img/carta.png" width = 100 height = auto>`;
+        cartas.innerHTML = `<img`;
         mano = 0;
         manoPc = 0;
         btnPedir.disabled = true;
@@ -485,6 +485,8 @@ btnDeal.addEventListener("click", async () =>{
     btnQuedar.disabled = false;
     let i = 0;
     await repartir()
+    imgUserDiv.innerHTML = ``;
+    imgPcDiv.innerHTML = ``;
     imgs.forEach(element => {
         if(i<2){
             let imgJugador = document.createElement("img");
